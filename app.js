@@ -210,6 +210,7 @@ let selectedDriverCode = "HAM";
 let compareDriverOneCode = "HAM";
 let compareDriverTwoCode = "LEC";
 let timer = null;
+let markerProgress = 2;
 
 const elements = {
   playBtn: document.querySelector("#playBtn"),
@@ -222,6 +223,7 @@ const elements = {
   centerDriver: document.querySelector("#centerDriver"),
   markerLayer: document.querySelector("#markerLayer"),
   driverSelect: document.querySelector("#driverSelect"),
+  positionList: document.querySelector("#positionList"),
   tyreFilter: document.querySelector("#tyreFilter"),
   tyreDriverList: document.querySelector("#tyreDriverList"),
   softCount: document.querySelector("#softCount"),
@@ -360,21 +362,29 @@ function buildMarkers() {
   });
 }
 
-function getMarkerSlot(driverIndex, lap) {
-  const movementStep = Math.floor((lap - 1) / 2);
-  const slotIndex = (driverIndex + movementStep) % markerSlots.length;
-  return markerSlots[slotIndex];
+function getMarkerSlot(driverIndex, progress) {
+  const movement = Math.max(0, (progress - 1) / 2);
+  const baseStep = Math.floor(movement);
+  const fraction = movement - baseStep;
+  const currentIndex = (driverIndex + baseStep) % markerSlots.length;
+  const nextIndex = (currentIndex + 1) % markerSlots.length;
+  const [currentLeft, currentTop] = markerSlots[currentIndex];
+  const [nextLeft, nextTop] = markerSlots[nextIndex];
+
+  return [
+    currentLeft + (nextLeft - currentLeft) * fraction,
+    currentTop + (nextTop - currentTop) * fraction,
+  ];
 }
 
-function renderMarkers() {
-  const lap = getLap();
+function renderMarkers(progress = markerProgress) {
   const comparedCodes = new Set([compareDriverOneCode, compareDriverTwoCode]);
 
   drivers.forEach((driver, index) => {
     const marker = elements.markerLayer.querySelector(
       `[data-code="${driver.code}"]`,
     );
-    const [left, top] = getMarkerSlot(index, lap);
+    const [left, top] = getMarkerSlot(index, progress);
 
     marker.style.left = `${left}%`;
     marker.style.top = `${top}%`;
@@ -383,6 +393,40 @@ function renderMarkers() {
       "compared",
       comparedCodes.has(driver.code) && driver.code !== selectedDriverCode,
     );
+  });
+}
+
+function renderPositionWall() {
+  const lap = getLap();
+  elements.positionList.innerHTML = "";
+
+  drivers.forEach((driver) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "position-row";
+    row.classList.toggle("active", driver.code === selectedDriverCode);
+
+    const gap =
+      driver.position === 1
+        ? "Leader"
+        : `+${getGapToLeader(driver, lap).toFixed(1)}s`;
+
+    row.innerHTML = `
+      <span class="position-number">P${driver.position}</span>
+      <span class="position-code">${driver.code}</span>
+      <span class="position-name">${driver.name}</span>
+      <span class="position-gap">${gap}</span>
+    `;
+
+    row.addEventListener("click", () => {
+      selectedDriverCode = driver.code;
+      compareDriverOneCode = driver.code;
+      elements.driverSelect.value = driver.code;
+      elements.compareDriverOne.value = driver.code;
+      renderAll();
+    });
+
+    elements.positionList.appendChild(row);
   });
 }
 
@@ -521,6 +565,7 @@ function renderLapLabels() {
 function renderAll() {
   renderLapLabels();
   renderMarkers();
+  renderPositionWall();
   renderTyreSummary();
   renderPitProgress();
   renderSelectedDriver();
@@ -535,6 +580,7 @@ function syncSelectValues() {
 
 function setLap(lap) {
   const safeLap = Math.min(TOTAL_LAPS, Math.max(1, lap));
+  markerProgress = safeLap;
   elements.lapSlider.value = safeLap;
   renderAll();
 }
@@ -548,19 +594,37 @@ function togglePlayback() {
   }
 
   elements.playBtn.textContent = "Pause";
+  markerProgress = getLap();
+  let lastDisplayedLap = getLap();
 
   timer = window.setInterval(() => {
-    const nextLap = getLap() + 1;
+    markerProgress += 0.12;
 
-    if (nextLap > TOTAL_LAPS) {
+    if (markerProgress > TOTAL_LAPS) {
+      markerProgress = TOTAL_LAPS;
       window.clearInterval(timer);
       timer = null;
       elements.playBtn.textContent = "Play";
-      return;
     }
 
-    setLap(nextLap);
-  }, 850);
+    renderMarkers(markerProgress);
+
+    const displayedLap = Math.min(
+      TOTAL_LAPS,
+      Math.floor(markerProgress),
+    );
+
+    if (displayedLap !== lastDisplayedLap) {
+      lastDisplayedLap = displayedLap;
+      elements.lapSlider.value = displayedLap;
+      renderLapLabels();
+      renderPositionWall();
+      renderTyreSummary();
+      renderPitProgress();
+      renderSelectedDriver();
+      renderComparison();
+    }
+  }, 70);
 }
 
 function initialise() {
