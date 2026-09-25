@@ -124,24 +124,10 @@
               <p class="section-kicker">The field</p>
               <h2>Las Vegas · Lap <span id="fieldLap">2</span></h2>
             </div>
-
-            <div class="driver-tools">
-              <div class="driver-picker">
-                <label for="driverSelect">Select a driver</label>
-                <select id="driverSelect" class="select-control"></select>
-              </div>
-
-              <div class="position-wall" aria-label="Current running order">
-                <div class="position-wall-heading">
-                  <span>Running order</span>
-                  <small>scroll to P20</small>
-                </div>
-                <div id="positionList" class="position-list"></div>
-              </div>
-            </div>
           </div>
 
-          <div class="track-stage">
+          <div class="track-content">
+            <div class="track-stage">
             <svg
               id="trackSvg"
               class="track-svg"
@@ -179,6 +165,22 @@
               <strong>Lap <b id="centerLap">2</b></strong>
               <small id="centerDriver">Lewis Hamilton</small>
             </div>
+            </div>
+
+            <aside class="driver-tools">
+              <div class="driver-picker">
+                <label for="driverSelect">Select a driver</label>
+                <select id="driverSelect" class="select-control"></select>
+              </div>
+
+              <div class="position-wall" aria-label="Current running order">
+                <div class="position-wall-heading">
+                  <span>Running order</span>
+                  <small>scroll to P20</small>
+                </div>
+                <div id="positionList" class="position-list"></div>
+              </div>
+            </aside>
           </div>
 
           <div id="selectedDriverCard" class="selected-driver-card">
