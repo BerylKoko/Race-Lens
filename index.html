@@ -125,9 +125,19 @@
               <h2>Las Vegas · Lap <span id="fieldLap">2</span></h2>
             </div>
 
-            <div class="driver-picker">
-              <label for="driverSelect">Select a driver</label>
-              <select id="driverSelect" class="select-control"></select>
+            <div class="driver-tools">
+              <div class="driver-picker">
+                <label for="driverSelect">Select a driver</label>
+                <select id="driverSelect" class="select-control"></select>
+              </div>
+
+              <div class="position-wall" aria-label="Current running order">
+                <div class="position-wall-heading">
+                  <span>Running order</span>
+                  <small>scroll to P20</small>
+                </div>
+                <div id="positionList" class="position-list"></div>
+              </div>
             </div>
           </div>
 
@@ -218,7 +228,7 @@
         <div class="comparison-heading">
           <div>
             <p class="section-kicker">Driver comparison</p>
-            <h2 id="comparisonTitle">Put two race stories side by side</h2>
+            <h2 id="comparisonTitle">Put 2 drivers side by side</h2>
           </div>
 
           <p class="muted">
