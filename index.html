@@ -1,106 +1,306 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Race Lens — F1 race replay concept</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <main class="shell">
-    <header class="topbar">
-      <div>
-        <h1>race lens<span>/</span></h1>
-        <p>Race replay · Explore the field, not just the order</p>
-      </div>
-      <div class="badge">Interactive design concept</div>
-    </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Race Lens is an interactive Formula 1 replay concept designed to make race strategy easier to understand for newer viewers."
+    />
+    <title>Race Lens — F1 race replay concept</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-    <section class="controls" aria-label="Replay controls">
-      <button id="playBtn" class="play">Play</button>
-      <div class="lap-readout">Lap <strong id="lapNow">2</strong> / 50</div>
-      <input id="lapSlider" type="range" min="1" max="50" value="2" aria-label="Race lap" />
-      <button id="previewBtn" class="ghost">Preview lap 24</button>
-    </section>
-
-    <section class="workspace">
-      <aside class="snapshot">
-        <h2>Race snapshot</h2>
-        <p class="muted">20 drivers · End-of-lap snapshot</p>
-
-        <div class="statblock">
-          <h3>TYRES ON THE FIELD</h3>
-          <div class="tyre-row"><span><i class="dot soft"></i>Soft</span><b id="softCount">5</b></div>
-          <div class="bar"><i class="softbar" style="width:25%"></i></div>
-          <div class="tyre-row"><span><i class="dot medium"></i>Medium</span><b id="medCount">10</b></div>
-          <div class="bar"><i class="medbar" style="width:50%"></i></div>
-          <div class="tyre-row"><span><i class="dot hard"></i>Hard</span><b id="hardCount">5</b></div>
-          <div class="bar"><i class="hardbar" style="width:25%"></i></div>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">F1 race replay concept</p>
+          <h1>Race Lens</h1>
+          <p class="subtitle">Explore the field, not just the order.</p>
         </div>
 
-        <div class="statblock">
-          <h3>PIT-STOP PROGRESS</h3>
-          <p><strong id="stopped">0</strong> of 20 drivers have stopped</p>
-          <hr />
-          <p><strong id="starting">20</strong> still on starting tyres</p>
+        <div class="prototype-badge">Interactive prototype</div>
+      </header>
+
+      <section class="replay-controls" aria-label="Replay controls">
+        <button id="playBtn" class="button button-primary" type="button">
+          Play
+        </button>
+
+        <div class="lap-readout">
+          Lap <strong id="lapNow">2</strong> / 50
         </div>
 
-        <div class="why">
-          <span>WHY THIS VIEW</span>
-          <p>The map gives novices a spatial starting point, while the side panel keeps only the race context needed to interpret it.</p>
-        </div>
-      </aside>
+        <input
+          id="lapSlider"
+          class="lap-slider"
+          type="range"
+          min="1"
+          max="50"
+          value="2"
+          aria-label="Race lap"
+        />
 
-      <section class="field">
-        <div class="field-head">
-          <h2>The field at lap <span id="fieldLap">2</span></h2>
-          <p>Select a driver</p>
-        </div>
-        <div id="track" class="track" aria-label="Illustrative track map">
-          <div class="track-inner">
-            <span>REPLAY</span>
-            <strong>Lap <b id="centerLap">2</b></strong>
-            <small id="centerDriver">Leclerc</small>
-          </div>
-        </div>
-        <p class="caption">Illustrative marker spacing · Select a driver to compare time gaps and tyre strategy</p>
+        <button id="previewBtn" class="button button-secondary" type="button">
+          Preview lap 24
+        </button>
       </section>
-    </section>
 
-    <section id="drawer" class="drawer" aria-live="polite">
-      <div class="drawer-head"><span>DRIVER FOCUS</span><button id="closeBtn" class="ghost">Close</button></div>
-      <h2 id="driverName">Leclerc</h2>
-      <p id="driverMeta" class="muted">Position 3 · Medium tyres</p>
+      <section class="race-layout">
+        <aside class="race-sidebar" aria-label="Race snapshot">
+          <section>
+            <p class="section-kicker">Race snapshot</p>
+            <h2>Lap <span id="snapshotLap">2</span></h2>
+            <p class="muted">20 drivers · illustrative replay data</p>
+          </section>
 
-      <h3>TYRE STRATEGY</h3>
-      <div class="strategy-grid">
-        <div>
-          <p id="focusName">Leclerc</p>
-          <div class="stint"><span id="focusCompound">M</span></div>
-          <div class="stint-labels"><span>Lap 1</span><span>Lap <b id="strategyLap">2</b></span></div>
-          <p class="muted" id="focusStop">No pit stop yet</p>
+          <section class="sidebar-block">
+            <div class="block-heading-row">
+              <h3>Tyres on the field</h3>
+              <span class="tiny-label">current lap</span>
+            </div>
+
+            <div class="tyre-summary-list">
+              <div class="tyre-summary-row">
+                <span><i class="tyre-dot tyre-soft"></i>Soft</span>
+                <strong id="softCount">0</strong>
+              </div>
+              <div class="summary-bar">
+                <span id="softBar" class="summary-fill soft-fill"></span>
+              </div>
+
+              <div class="tyre-summary-row">
+                <span><i class="tyre-dot tyre-medium"></i>Medium</span>
+                <strong id="mediumCount">0</strong>
+              </div>
+              <div class="summary-bar">
+                <span id="mediumBar" class="summary-fill medium-fill"></span>
+              </div>
+
+              <div class="tyre-summary-row">
+                <span><i class="tyre-dot tyre-hard"></i>Hard</span>
+                <strong id="hardCount">0</strong>
+              </div>
+              <div class="summary-bar">
+                <span id="hardBar" class="summary-fill hard-fill"></span>
+              </div>
+            </div>
+
+            <label class="field-label" for="tyreFilter">Who is on…</label>
+            <select id="tyreFilter" class="select-control">
+              <option value="Soft">Soft tyres</option>
+              <option value="Medium">Medium tyres</option>
+              <option value="Hard">Hard tyres</option>
+            </select>
+
+            <div id="tyreDriverList" class="tyre-driver-list"></div>
+          </section>
+
+          <section class="sidebar-block">
+            <h3>Pit-stop progress</h3>
+            <div class="progress-stat">
+              <strong id="stoppedCount">0</strong>
+              <span>of 20 drivers have stopped</span>
+            </div>
+            <div class="divider"></div>
+            <p class="muted">
+              <strong id="startingTyresCount">20</strong> still on starting tyres
+            </p>
+          </section>
+
+          <section class="design-note">
+            <span>Design intent</span>
+            <p>
+              Start with a simple spatial view, then reveal strategy and timing detail
+              only when the viewer asks for it.
+            </p>
+          </section>
+        </aside>
+
+        <section class="track-panel">
+          <div class="track-panel-header">
+            <div>
+              <p class="section-kicker">The field</p>
+              <h2>Las Vegas · Lap <span id="fieldLap">2</span></h2>
+            </div>
+
+            <div class="driver-picker">
+              <label for="driverSelect">Select a driver</label>
+              <select id="driverSelect" class="select-control"></select>
+            </div>
+          </div>
+
+          <div class="track-stage">
+            <svg
+              id="trackSvg"
+              class="track-svg"
+              viewBox="0 0 1000 620"
+              role="img"
+              aria-label="Simplified Las Vegas-style street circuit"
+            >
+              <path
+                id="trackPath"
+                class="track-path"
+                d="M 174 520
+                   C 115 493 92 441 108 386
+                   L 168 170
+                   C 181 122 223 91 278 86
+                   L 704 86
+                   C 775 86 821 105 849 147
+                   C 872 180 884 226 876 276
+                   L 842 472
+                   C 834 519 805 547 756 549
+                   L 585 549
+                   C 540 548 516 530 501 498
+                   L 452 393
+                   C 439 364 414 350 383 353
+                   L 294 362
+                   C 258 366 236 390 235 425
+                   L 235 467
+                   C 234 505 212 531 174 520 Z"
+              ></path>
+            </svg>
+
+            <div id="markerLayer" class="marker-layer"></div>
+
+            <div class="track-center-copy" aria-hidden="true">
+              <span>REPLAY</span>
+              <strong>Lap <b id="centerLap">2</b></strong>
+              <small id="centerDriver">Lewis Hamilton</small>
+            </div>
+          </div>
+
+          <div id="selectedDriverCard" class="selected-driver-card">
+            <div class="driver-card-heading">
+              <div>
+                <p class="section-kicker">Driver focus</p>
+                <h2 id="selectedDriverName">Lewis Hamilton</h2>
+                <p id="selectedDriverTeam" class="muted">Ferrari</p>
+              </div>
+
+              <span id="selectedPositionBadge" class="position-badge">P5</span>
+            </div>
+
+            <div class="driver-stat-grid">
+              <div class="driver-stat">
+                <span>Current tyre</span>
+                <strong id="selectedTyre">Medium · 2 laps old</strong>
+              </div>
+
+              <div class="driver-stat">
+                <span>Gap</span>
+                <strong id="selectedGap">8.4s behind leader</strong>
+              </div>
+
+              <div class="driver-stat">
+                <span>Pit status</span>
+                <strong id="selectedPit">Not stopped yet</strong>
+              </div>
+
+              <div class="driver-stat">
+                <span>Race lap</span>
+                <strong id="selectedLap">Lap 2 of 50</strong>
+              </div>
+            </div>
+
+            <p id="selectedContext" class="context-note"></p>
+          </div>
+
+          <p class="prototype-note">
+            Prototype uses illustrative race data. The interaction model—not the race
+            result—is the design focus.
+          </p>
+        </section>
+      </section>
+
+      <section class="comparison-section" aria-labelledby="comparisonTitle">
+        <div class="comparison-heading">
+          <div>
+            <p class="section-kicker">Driver comparison</p>
+            <h2 id="comparisonTitle">Put two race stories side by side</h2>
+          </div>
+
+          <p class="muted">
+            Compare timing, tyres, and pit strategy without leaving the track view.
+          </p>
         </div>
-        <div>
-          <p id="compareName">Sainz</p>
-          <div class="stint compare"><span id="compareCompound">M</span></div>
-          <div class="stint-labels"><span>Lap 1</span><span>Lap <b id="compareLap">2</b></span></div>
-          <p class="muted" id="compareStop">No pit stop yet</p>
+
+        <div class="comparison-pickers">
+          <label>
+            Driver one
+            <select id="compareDriverOne" class="select-control"></select>
+          </label>
+
+          <span class="versus">vs.</span>
+
+          <label>
+            Driver two
+            <select id="compareDriverTwo" class="select-control"></select>
+          </label>
         </div>
-      </div>
 
-      <hr />
-      <label for="compareSelect">Compare with another driver</label>
-      <select id="compareSelect"></select>
+        <div class="comparison-grid">
+          <article class="comparison-card" id="comparisonCardOne">
+            <p class="section-kicker">Driver one</p>
+            <div class="comparison-name-row">
+              <div>
+                <h3 id="compareOneName">Lewis Hamilton</h3>
+                <p id="compareOneTeam" class="muted">Ferrari</p>
+              </div>
+              <span id="compareOnePosition" class="position-badge">P5</span>
+            </div>
 
-      <div class="between">
-        <h3>BETWEEN THESE DRIVERS</h3>
-        <strong id="gap">3.4 s</strong>
-        <p id="gapText">Leclerc is ahead of Sainz</p>
-        <hr />
-        <p class="muted" id="trend">Separation increased by 0.0 s over 1 lap.</p>
-      </div>
-    </section>
-  </main>
-  <script src="app.js"></script>
-</body>
+            <dl class="comparison-stats">
+              <div>
+                <dt>Tyre</dt>
+                <dd id="compareOneTyre">Medium · 2 laps</dd>
+              </div>
+              <div>
+                <dt>Gap to leader</dt>
+                <dd id="compareOneGap">8.4s</dd>
+              </div>
+              <div>
+                <dt>Pit status</dt>
+                <dd id="compareOnePit">Not stopped</dd>
+              </div>
+            </dl>
+          </article>
+
+          <article class="comparison-card" id="comparisonCardTwo">
+            <p class="section-kicker">Driver two</p>
+            <div class="comparison-name-row">
+              <div>
+                <h3 id="compareTwoName">Charles Leclerc</h3>
+                <p id="compareTwoTeam" class="muted">Ferrari</p>
+              </div>
+              <span id="compareTwoPosition" class="position-badge">P3</span>
+            </div>
+
+            <dl class="comparison-stats">
+              <div>
+                <dt>Tyre</dt>
+                <dd id="compareTwoTyre">Medium · 2 laps</dd>
+              </div>
+              <div>
+                <dt>Gap to leader</dt>
+                <dd id="compareTwoGap">4.6s</dd>
+              </div>
+              <div>
+                <dt>Pit status</dt>
+                <dd id="compareTwoPit">Not stopped</dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+
+        <div class="comparison-result">
+          <p id="comparisonResult">Leclerc is 3.8s ahead of Hamilton.</p>
+          <span id="comparisonTrend">The gap has changed by 0.2s over the last 3 laps.</span>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
 </html>
