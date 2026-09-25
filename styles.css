@@ -333,8 +333,99 @@ button {
   padding: 38px 42px 46px;
 }
 
+.driver-tools {
+  width: min(310px, 44vw);
+}
+
 .driver-picker {
-  width: min(270px, 42vw);
+  width: 100%;
+}
+
+.position-wall {
+  margin-top: 14px;
+  padding: 10px;
+  background: #0d1117;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.position-wall-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: #c8d0db;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.position-wall-heading small {
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.position-list {
+  max-height: 245px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.position-row {
+  display: grid;
+  grid-template-columns: 34px 46px minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  padding: 8px 7px;
+  color: #e8edf4;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #202733;
+  text-align: left;
+}
+
+.position-row:last-child {
+  border-bottom: 0;
+}
+
+.position-row:hover,
+.position-row.active {
+  background: #17211f;
+}
+
+.position-row.active {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.position-number {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.position-code {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.position-name {
+  overflow: hidden;
+  color: #cbd3df;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.position-gap {
+  color: var(--muted);
+  font-size: 0.74rem;
+  white-space: nowrap;
 }
 
 .driver-picker label {
@@ -392,8 +483,8 @@ button {
   text-align: center;
   pointer-events: auto;
   transition:
-    left 520ms linear,
-    top 520ms linear,
+    left 90ms linear,
+    top 90ms linear,
     transform 160ms ease,
     background 160ms ease,
     border-color 160ms ease;
@@ -657,6 +748,7 @@ button {
     border-bottom: 1px solid var(--line);
   }
 
+  .driver-tools,
   .driver-picker {
     width: 100%;
   }
