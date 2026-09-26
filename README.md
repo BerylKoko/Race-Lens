@@ -1,4 +1,6 @@
 # Race Lens
+
+**Live site:** https://berylkoko.github.io/Race-Lens/
 Standalone HTML/CSS/JS interactive prototype for a novice-friendly Formula 1 race replay concept.
 
 Open `index.html` locally, or deploy the folder as a static site on GitHub Pages/Render.
