@@ -72,6 +72,7 @@
     $('tyreSummary').innerHTML=['Soft','Medium','Hard'].map(name=>{
       const percent=Math.round(counts[name]/(active.length||1)*100);return `<div class="tyre-line"><span><i class="tyre-dot ${name.toLowerCase()}"></i>${name}</span><b>${counts[name]}</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:${percent}%;background:${name==='Soft'?'#f36b8f':name==='Medium'?'#f5d275':'#ecf3f9'}"></span></div>`;
     }).join('');
+    if(counts.Unknown) $('tyreSummary').insertAdjacentHTML('beforeend',`<p class="quiet-small">${counts.Unknown} driver${counts.Unknown===1?' has':'s have'} no verified compound at this lap.</p>`);
     const matches=runningAt().filter(filtered);
     const chips=matches.map(code=>`<button class="filter-chip" type="button" data-focus="${code}" title="Focus ${driver(code).name}">${code}</button>`).join('');
     $('filterResults').innerHTML= chips||'<span class="empty-filter">No matching active drivers in this snapshot.</span>';
@@ -191,7 +192,7 @@
     document.querySelectorAll('.help').forEach(el=>{
       el.addEventListener('mouseenter',()=>showTooltip(el));el.addEventListener('mouseleave',hideTooltip);
       el.addEventListener('focus',()=>showTooltip(el));el.addEventListener('blur',hideTooltip);
-      el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(tooltipAnchor===el&&!$('tooltip').hidden)hideTooltip();else showTooltip(el);});
+      el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();showTooltip(el);});
     });
     document.addEventListener('pointerdown',e=>{if(!e.target.closest('.help'))hideTooltip();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){hideTooltip();}});
