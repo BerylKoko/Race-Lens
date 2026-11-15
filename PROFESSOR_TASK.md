@@ -1,31 +1,48 @@
-# Race Lens — five-to-seven-minute usability task
+# Race Lens — think-aloud test for Prof. Huang
 
-**Participant:** Prof. Huang (first pilot)  
-**Interface:** `index.html` — start at **Race replay**, lap 2, Hamilton focused.
+**Course:** Cornell INFO 4900 · Interface Research / November 2026  
+**Prototype:** 2025 Las Vegas Grand Prix historical replay  
+**Purpose:** Check whether the map-first layout, integrated Driver Focus comparison and contextual explanations help a novice locate and interpret race/qualifying information.
 
-## Read aloud / assign without demonstration
+## Primary independent task (7–10 minutes)
 
-> You missed the 2025 Las Vegas Grand Prix. Using this interface only: on lap 2, who was ahead—Lewis Hamilton or Charles Leclerc? Which of them made their first pit stop earlier, and on what laps? Then check qualifying: did Hamilton reach Q2, and who set the quicker Q1 lap?
+Give Prof. Huang the clickable prototype at **Race replay**, lap 2, Hamilton selected. Do **not** point out where the Compare control, tyre filters or qualifying tab are. Ask her to think aloud, explaining what she expects each control to do.
 
-Encourage think-aloud. Do not explain which controls to use or definitions during the task. Allow the participant to click around freely; do not intervene unless they explicitly give up.
+> You missed the 2025 Las Vegas Grand Prix. Using this interface only, go to lap 2 and compare Lewis Hamilton with Charles Leclerc. Who was ahead? Use a question-mark icon to learn what a pit stop means, then work out who made their first stop earlier. In the same comparison, which driver has the faster best Sector 1 time? Finally, open qualifying: did Hamilton reach Q2, and which driver recorded the quicker Q1 time?
 
-## Observer success criteria
+### Observer checklist
 
-- [ ] Finds lap 2 without coaching.
-- [ ] Uses Driver Focus and integrated Compare to access two-driver information.
-- [ ] Correctly reports **Leclerc P8**, ahead of **Hamilton P12** on lap 2.
-- [ ] Determines **Leclerc stopped lap 24**, **Hamilton lap 29**; Leclerc stopped **5 laps earlier**.
-- [ ] Navigates to Qualifying & Pace and recognizes Hamilton has no Q2 time because he was eliminated after Q1.
-- [ ] Identifies **Leclerc Q1 1:54.814** vs **Hamilton Q1 1:57.115**; Leclerc faster **2.301s**.
-- [ ] Explains the answer in their own words, without needing an external glossary.
+- [ ] Locates or confirms lap 2 using the replay controls.
+- [ ] Finds Driver Focus and changes a driver, if needed, without coaching.
+- [ ] Discovers Compare, selects the second driver and interprets the plain-language comparison.
+- [ ] Reports Charles Leclerc ahead of Lewis Hamilton at lap 2 (P8 vs P12).
+- [ ] Opens a **?** tooltip and understands that a pit stop is pit-lane service, commonly to change tyres.
+- [ ] Finds Leclerc's first stop on lap **24** and Hamilton's on lap **29**.
+- [ ] Identifies the quicker *best race* S1: Leclerc 26.798s vs Hamilton 26.937s (**0.139s** quicker); understands these bests may come from different laps.
+- [ ] Follows the same selected pair into Qualifying & Pace without resetting the drivers.
+- [ ] Understands Hamilton did not reach Q2; missing Q2/Q3 times are not zero values.
+- [ ] Reads Leclerc Q1 **1:54.814** vs Hamilton Q1 **1:57.115** (**2.301s** quicker).
+- [ ] Can distinguish **Q1/Q2/Q3 qualifying sessions** from **S1/S2/S3 lap sectors** without external explanation.
 
-**Observe:** Time to first correct answer: ______; total time: ______; navigation errors: ______; tooltip opens: ______; unclear terms: ______; where the participant hesitated: __________________________________.
+Record total time ______ ; first hesitation ______ ; incorrect click(s) ______ ; tooltip use ______ ; explanation requested ______ ; successful completion? ______ .
 
-**Follow-up questions (after task):**
+## Optional second task: controls and interpretation (3–5 minutes)
 
-1. What felt easiest to understand?
-2. Where did you feel lost or need extra explanation?
-3. Did the Compare button appear where you expected it?
-4. Can you explain the difference between Q1/Q2/Q3 and S1/S2/S3?
+> Use the tyre checkboxes to show only drivers on Medium tyres, then show All again. Use a race-event shortcut to move to lap 24, and find Charles Leclerc on the map or running order. Now zoom the track, reset it, and return to qualifying. Select Q2 to highlight it and explain why Hamilton has no time there. What does the speed chart tell you—and what does it **not** claim to measure?
 
-**Research interpretation:** One successful pilot is feedback, not proof of usability. Revise high-friction interactions and re-test with novice participants. The map animation and speed teaching graph are marked schematic; do not use them to test claims about GPS accuracy or actual telemetry.
+Look for whether tyre filters affect the running order and markers, and whether the distinction between recorded history and schematic visualization is understood.
+
+## Answer key (observer only; do not disclose during task)
+
+At **lap 2**, Leclerc is **P8** and Hamilton **P12**; Leclerc is ahead. Their verified sampled leader gaps are **+13.104s** and **+19.016s**, respectively (a **5.912s** difference). Leclerc first pits lap **24**, Hamilton lap **29**. Leclerc's individual best race-sector 1 is **26.798s** versus Hamilton's **26.937s**, a **0.139s** difference; they need not have been set on the same lap. Hamilton's official qualifying Q1 is **1:57.115** and he does not advance; Leclerc's Q1 is **1:54.814** (**2.301s** faster).
+
+The circuit shape, between-checkpoint animation and speed/brake/throttle chart are *schematic teaching visuals*, not GPS or measured telemetry. Do not score whether the visual motion matches the actual race.
+
+### After-task interview prompts
+
+1. Where did you expect to find the second-driver comparison? Did you find it there?
+2. Which number or chart was hardest to interpret? What helped?
+3. What do you understand by the difference between qualifying *sessions* and lap *sectors*?
+4. What would you move, hide or rename to make the interface clearer for a first-time F1 viewer?
+
+One successful professor walkthrough is formative feedback, **not a validated usability finding**. Record observations and then run tasks with novice participants.
