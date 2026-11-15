@@ -39,4 +39,4 @@ Observer answers: At lap 2, **Leclerc P8** vs **Hamilton P12**. Leclerc first st
 
 Independent study prototype; for educational use, not affiliated with Formula 1 or FIA.
 
-**GitHub Pages deployment:** `index.html` is self-contained (all CSS, JavaScript and reference data are inlined for immediate browser use). For a modular HTML/CSS/JS version, use the downloadable package supplied in the ChatGPT conversation.
+**GitHub Pages deployment:** the website loads the four modular files `index.html`, `styles.css`, `data.js` and `app.js`. The downloadable package also provides a single-file standalone HTML alternative.
