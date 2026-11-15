@@ -5,8 +5,8 @@
   const $ = (id) => document.getElementById(id);
   const state = {
     view:'race', lap:2, focused:'HAM', compared:'LEC', showCompare:false,
-    qualA:'NOR', qualB:'VER', tyreFilters:new Set(['All']), playing:false,
-    showAllMarkers:false, mapScale:1, panX:0, panY:0, dragging:false,
+    qualA:'NOR', qualB:'VER', tyreFilters:new Set(), playing:false,
+    showAllMarkers:true, mapScale:1, panX:0, panY:0, dragging:false,
     speedMetric:'speed', selectedSession:0
   };
   let playTimer=null, dragStart=null, tooltipAnchor=null;
@@ -21,11 +21,12 @@
   }
   function knownCheckpoint(lap){return Math.max(...Object.keys(ORDERS).map(Number).filter(n=>n<=lap))}
   function runningAt(lap=state.lap) {
-    let snapshot=ORDERS[knownCheckpoint(lap)].filter(code=>isActive(driver(code),lap));
-    if (lap===50) snapshot=[...snapshot,'LAW','COL'].filter((v,i,a)=>a.indexOf(v)===i);
-    return snapshot;
+    const base=[...ORDERS[knownCheckpoint(lap)]];
+    if (lap===50) base.push('LAW','COL');
+    const extras=DRIVERS.map(d=>d.code).filter(code=>!base.includes(code));
+    return [...base,...extras].filter((v,i,a)=>a.indexOf(v)===i);
   }
-  function position(code,lap=state.lap){const i=runningAt(lap).indexOf(code);return i>=0?i+1:null;}
+  function position(code,lap=state.lap){if(!isActive(driver(code),lap))return null;const i=runningAt(lap).indexOf(code);return i>=0?i+1:null;}
   function pitList(d,lap=state.lap) {return (PIT_STOPS[d.code]||[]).filter(n=>n<=lap);}
   function lastPit(d,lap=state.lap) {const list=pitList(d,lap);return list[list.length-1]??null;}
   function tyreState(d,lap=state.lap){
@@ -51,7 +52,7 @@
   }
   function tyreDisplay(d,lap=state.lap){const t=tyreState(d,lap);return t.age?`${t.name} · ${t.age} lap${t.age===1?'':'s'}`:t.name;}
   function setView(view){
-    if(!['race','qualifying','about'].includes(view))return;
+    if(!['race','qualifying'].includes(view))return;
     state.view=view; if(view!=='race')pause();
     document.querySelectorAll('.view').forEach(el=>{const selected=el.id===`${view}View`;el.classList.toggle('active',selected);el.hidden=!selected;});
     document.querySelectorAll('.top-tabs .tab').forEach(tab=>{const yes=tab.dataset.view===view;tab.classList.toggle('active',yes);if(yes)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current');});
@@ -64,18 +65,18 @@
   function setLap(next){state.lap=Math.max(1,Math.min(50,Math.round(next)));$('lapSlider').value=state.lap;renderReplay();}
   function pause(){if(playTimer!==null)window.clearInterval(playTimer);playTimer=null;state.playing=false;$('playText').textContent='Play replay';$('playIcon').textContent='▶';$('playBtn').setAttribute('aria-label','Play lap replay');}
   function play(){if(state.playing){pause();return;}if(state.lap===50)setLap(1);state.playing=true;$('playText').textContent='Pause replay';$('playIcon').textContent='Ⅱ';$('playBtn').setAttribute('aria-label','Pause lap replay');playTimer=window.setInterval(()=>{if(state.lap>=50){pause();return;}setLap(state.lap+1);},620)}
-  function filtered(code){if(state.tyreFilters.has('All'))return true;return state.tyreFilters.has(tyreState(driver(code)).name)}
+  function filtered(code){return !state.tyreFilters.size || state.tyreFilters.has(tyreState(driver(code)).name)}
   function renderTyres(){
     const active=DRIVERS.filter(d=>isActive(d));
     const counts={Soft:0,Medium:0,Hard:0,Unknown:0};active.forEach(d=>counts[tyreState(d).name]++);
-    $('fieldCount').textContent=`${DRIVERS.length} entered · ${active.length} classified/on track at lap ${state.lap}`;
+    $('fieldCount').textContent=`${DRIVERS.length} drivers · ${active.length} still running at lap ${state.lap}`;
     $('tyreSummary').innerHTML=['Soft','Medium','Hard'].map(name=>{
-      const percent=Math.round(counts[name]/(active.length||1)*100);return `<div class="tyre-line"><span><i class="tyre-dot ${name.toLowerCase()}"></i>${name}</span><b>${counts[name]}</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:${percent}%;background:${name==='Soft'?'#f36b8f':name==='Medium'?'#f5d275':'#ecf3f9'}"></span></div>`;
+      const percent=Math.round(counts[name]/(active.length||1)*100);const tip=name==='Soft'?'Soft: fastest grip, but it wears out the quickest.':name==='Medium'?'Medium: a balance between speed and tyre life.':'Hard: slower, but it lasts the longest.';return `<div class="tyre-line"><span><i class="tyre-dot ${name.toLowerCase()}"></i>${name} <button class="help inline-help" type="button" data-tip="${tip}" aria-label="What is a ${name.toLowerCase()} tyre?">?</button></span><b>${counts[name]}</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:${percent}%;background:${name==='Soft'?'#f36b8f':name==='Medium'?'#f5d275':'#ecf3f9'}"></span></div>`;
     }).join('');
-    if(counts.Unknown) $('tyreSummary').insertAdjacentHTML('beforeend',`<p class="quiet-small">${counts.Unknown} driver${counts.Unknown===1?' has':'s have'} no verified compound at this lap.</p>`);
-    const matches=runningAt().filter(filtered);
+    
+    const matches=runningAt().filter(code=>isActive(driver(code)) && filtered(code));
     const chips=matches.map(code=>`<button class="filter-chip" type="button" data-focus="${code}" title="Focus ${driver(code).name}">${code}</button>`).join('');
-    $('filterResults').innerHTML= chips||'<span class="empty-filter">No matching active drivers in this snapshot.</span>';
+    $('filterResults').innerHTML= state.tyreFilters.size ? (chips||'<span class="empty-filter">No drivers match that tyre.</span>') : '<span class="empty-filter">Select Soft, Medium, or Hard to list those drivers.</span>'; 
     const stopped=DRIVERS.filter(d=>pitList(d).length>0).length;$('stoppedCount').textContent=stopped;
   }
   function renderEvent(){
@@ -84,24 +85,24 @@
     document.querySelectorAll('.event-chip').forEach(el=>el.classList.toggle('current',Number(el.dataset.lap)===current.lap));
   }
   function renderOrder(){
-    const entries=runningAt().filter(filtered);const cp=knownCheckpoint(state.lap);
+    const entries=runningAt();const cp=knownCheckpoint(state.lap);
     $('runningOrder').innerHTML=entries.map(code=>{
-      const d=driver(code);const p=position(code);return `<button class="running-row ${state.focused===code?'active':''}" type="button" data-focus="${code}" aria-label="Focus ${d.name}, position ${p}"><span class="pos">P${p}</span><span class="code" style="border-left:2px solid ${d.color};padding-left:4px">${code}</span><span class="name">${d.name}</span><span class="team-indicator" style="background:${d.color}"></span></button>`;
-    }).join('')||'<p class="quiet-small">No drivers match the current filter.</p>';
-    $('runningFootnote').textContent=`On-track positions at lap ${cp} checkpoint${state.lap===50?' before post-race DSQ':''}. ${state.lap!==cp?'Intermediate laps reuse the last checked order.':''}`;
+      const d=driver(code);const p=position(code);return `<button class="running-row ${state.focused===code?'active':''}" type="button" data-focus="${code}" aria-label="Focus ${d.name}${p?`, position ${p}`:", retired"}"><span class="pos">${p?`P${p}`:"OUT"}</span><span class="code" style="border-left:2px solid ${d.color};padding-left:4px">${code}</span><span class="name">${d.name}</span><span class="team-indicator" style="background:${d.color}"></span></button>`;
+    }).join('');
+    if($('runningFootnote')) $('runningFootnote').textContent='';
   }
   function moveMarkers(){
     const path=$('trackPath');if(!path||!path.getTotalLength)return;
     const length=path.getTotalLength();const order=runningAt();
     $('markerLayer').innerHTML='';
-    const chosen=order.filter((code,i)=>filtered(code)&&(state.showAllMarkers||i<9||code===state.focused||code===state.compared));
+    const chosen=order;
     chosen.forEach(code=>{
       const d=driver(code);const rank=order.indexOf(code);
       // VISUAL ONLY: evenly spaced schematic markers moving along illustrative curve.
       const frac=((state.lap/50)*1.8 + .15 - rank*.021 + 4)%1;
       const point=path.getPointAtLength(frac*length);
-      const btn=document.createElement('button');btn.type='button';btn.className=`driver-marker ${code===state.focused?'focused':''} ${state.showCompare&&code===state.compared?'compared':''}`;
-      btn.textContent=code;btn.title=`${d.name} · P${rank+1} (schematic marker)`;btn.style.left=`${point.x/10}%`;btn.style.top=`${point.y/6.2}%`;btn.dataset.focus=code;
+      const btn=document.createElement('button');btn.type='button';btn.className=`driver-marker ${!isActive(d)?'retired':''} ${code===state.focused?'focused':''} ${state.showCompare&&code===state.compared?'compared':''}`;
+      btn.textContent=code;btn.title=`${d.name} · ${isActive(d)?`P${position(code)}`:"OUT"}`;btn.style.left=`${point.x/10}%`;btn.style.top=`${point.y/6.2}%`;btn.dataset.focus=code;
       btn.setAttribute('aria-label',`Focus ${d.name}`);$('markerLayer').append(btn);
     });
   }
@@ -114,8 +115,8 @@
     $('focusPit').textContent=pitText(d);
     $('focusLap').textContent=`Lap ${state.lap} / ${RACE.totalLaps}`;
     $('mapDriver').textContent=d.name;
-    $('focusInsight').textContent= !isActive(d)?`${d.name} is no longer active at this lap. Qualifying times remain available on the next tab.`
-      : `At the lap ${cp} verified position checkpoint, ${d.name} is ${p?`P${p}`:'not placed'}. ${d.name==='HAM'&&state.lap>=29?'Hamilton made his first stop at lap 29.':d.name==='LEC'&&state.lap>=24?'Leclerc made his first stop at lap 24.':'Select Compare to put a second driver beside this focus.'}`;
+    $('focusInsight').textContent= !isActive(d)?`${d.name} is out of the race at this lap.`
+      : `${d.name} is ${p?`P${p}`:'not placed'}${typeof knownGap(d.code)==='number'&&knownGap(d.code)>0?` and ${fmt(knownGap(d.code))}s behind the leader.`:knownGap(d.code)===0?' and leading the race.':'.'}`;
     $('compareToggle').setAttribute('aria-expanded',String(state.showCompare));
     $('compareInline').classList.toggle('hidden',!state.showCompare);
     $('compareInline').setAttribute('aria-hidden',String(!state.showCompare));
@@ -127,25 +128,25 @@
     $('compareBDetail').textContent=`P${position(b.code)??'—'} · ${tyreDisplay(b)}`;
     $('compareAPits').textContent=pitText(a);$('compareBPits').textContent=pitText(b);
     const aFirst=(PIT_STOPS[a.code]||[])[0],bFirst=(PIT_STOPS[b.code]||[])[0];
-    $('compareStrategy').textContent=typeof aFirst==='number'&&typeof bFirst==='number'?(aFirst===bFirst?`Both first stop on lap ${aFirst}`:`${firstName(a)} L${aFirst} · ${firstName(b)} L${bFirst} (${Math.abs(aFirst-bFirst)} laps apart)`):'Insufficient stop information';
+    if($('compareStrategy')) $('compareStrategy').textContent=typeof aFirst==='number'&&typeof bFirst==='number'?(aFirst===bFirst?`Both first stop on lap ${aFirst}`:`${firstName(a)} L${aFirst} · ${firstName(b)} L${bFirst}`):'';
     const pa=position(a.code),pb=position(b.code),gapA=knownGap(a.code),gapB=knownGap(b.code);
     let takeaway='';
     if(!pa||!pb)takeaway=`One of these drivers is not running at lap ${state.lap}. Review an earlier lap.`;
-    else if(pa===pb)takeaway=`${a.name} and ${b.name} cannot share a position. Check your selections.`;
+    else if(pa===pb)takeaway=`${a.name} and ${b.name} are shown at the same position.`;
     else {
       const ahead=pa<pb?a:b,behind=pa<pb?b:a;
       if(typeof gapA==='number'&&typeof gapB==='number'){
-        takeaway=`${ahead.name} is ${fmt(Math.abs(gapA-gapB))} seconds ahead of ${behind.name} at lap ${state.lap}.`;
-      } else takeaway=`At the verified lap ${cp} checkpoint, ${ahead.name} is P${Math.min(pa,pb)} and ${behind.name} is P${Math.max(pa,pb)}.`;
+        takeaway=`${ahead.name} is ahead of ${behind.name} by ${fmt(Math.abs(gapA-gapB))}s.`;
+      } else takeaway=`${ahead.name} is ahead in P${Math.min(pa,pb)}. ${behind.name} is P${Math.max(pa,pb)}.`;
     }
     $('compareTakeaway').textContent=takeaway;
     const earlier=Object.keys(GAPS).map(Number).filter(l=>l<state.lap).sort((x,y)=>y-x).find(l=>typeof GAPS[l][a.code]==='number' && typeof GAPS[l][b.code]==='number');
     if(earlier!==undefined && typeof gapA==='number' && typeof gapB==='number'){
       const oldDistance=Math.abs(GAPS[earlier][a.code]-GAPS[earlier][b.code]);
       const newDistance=Math.abs(gapA-gapB),difference=newDistance-oldDistance;
-      $('compareTrend').textContent=`Checked time-gap trend: the pair gap has ${Math.abs(difference)<.0005?'stayed level':difference>0?'widened':'narrowed'} by ${fmt(Math.abs(difference))}s since lap ${earlier}.`;
-    }else $('compareTrend').textContent='Lap-by-lap time delta not available from the sampled timing checkpoints at this lap.';
-    $('compareEvidence').textContent=typeof gapA==='number'&&typeof gapB==='number'?'Timing comparison uses verified FIA gaps to the same race leader at this lap.':`Exact pairwise timing gap not checked for lap ${state.lap}. Position order comes from lap ${cp}; no synthetic time difference is displayed.`;
+          }
+    if($('compareTrend')) $('compareTrend').textContent='';
+    if($('compareEvidence')) $('compareEvidence').textContent='';
     renderInlineTiming(a,b);
   }
   function renderInlineTiming(a,b){
@@ -166,26 +167,23 @@
     const q1a=sec(a.q[0]),q1b=sec(b.q[0]);
     const q1Line=q1a!==null&&q1b!==null?`In Q1, ${(q1a<q1b?a:b).name} was ${fmt(Math.abs(q1a-q1b))}s quicker.`:'A directly comparable Q1 result is not available.';
     const sectorLine=sa&&sb?`In each driver’s best recorded race S1, ${(sa[0]<sb[0]?a:b).name} was ${fmt(Math.abs(sa[0]-sb[0]))}s quicker.`:'Best race-sector comparison is not available for this pair.';
-    $('inlineTimingSummary').textContent=`${q1Line} ${sectorLine} Qualifying sessions and best race sectors are separate measurements.`;
+    $('inlineTimingSummary').textContent=`${q1Line} ${sectorLine}`;
   }
   function renderReplay(){
     for(const id of ['lapNumber','snapshotLap','fieldLap','mapLap'])$(id).textContent=state.lap;
     const cp=knownCheckpoint(state.lap);
-    $('checkpointNote').textContent=state.lap===cp?`✓ On-track order verified at lap ${cp} · source: FIA race lap chart`:`ℹ Showing last verified running-order checkpoint: lap ${cp}. Playback markers are schematic.`;
-    renderTyres();renderEvent();renderOrder();moveMarkers();renderFocus();
+    $('checkpointNote').textContent='';
+    renderTyres();renderOrder();moveMarkers();renderFocus();
   }
   function setCompare(open){state.showCompare=!!open;renderFocus();moveMarkers();if(open){$('compareInline').scrollIntoView({block:'nearest',behavior:'smooth'});}}
   function configureTyres(){
     const inputs=[...document.querySelectorAll('#tyreFilters input')];
     inputs.forEach(inp=>inp.addEventListener('change',()=>{
-      if(inp.value==='All'&&inp.checked){state.tyreFilters=new Set(['All']);}
-      else if(inp.value!=='All'&&inp.checked){state.tyreFilters.delete('All');state.tyreFilters.add(inp.value);}
-      else{state.tyreFilters.delete(inp.value);if(!state.tyreFilters.size)state.tyreFilters.add('All');}
-      inputs.forEach(box=>box.checked=state.tyreFilters.has(box.value));renderReplay();
+      if(inp.checked) state.tyreFilters.add(inp.value);
+      else state.tyreFilters.delete(inp.value);
+      inputs.forEach(box=>box.checked=state.tyreFilters.has(box.value));
+      renderReplay();
     }));
-  }
-  function populateEvents(){
-    $('eventShortcuts').innerHTML=EVENTS.map(e=>`<button type="button" class="event-chip" data-lap="${e.lap}" title="${e.detail}">L${e.lap} · ${e.title}</button>`).join('');
   }
   // Map pan/zoom: independent of analytical timing data.
   function renderMapTransform(){ $('trackCanvas').style.transform=`translate(${state.panX}px, ${state.panY}px) scale(${state.mapScale})`; }
@@ -204,19 +202,32 @@
     viewport.addEventListener('pointerup',end);viewport.addEventListener('pointercancel',end);
     $('zoomIn').addEventListener('click',()=>adjustZoom(1.22));$('zoomOut').addEventListener('click',()=>adjustZoom(1/1.22));
     $('resetMap').addEventListener('click',()=>{state.mapScale=1;state.panX=0;state.panY=0;renderMapTransform();});
-    $('showAllMarkers').addEventListener('change',e=>{state.showAllMarkers=e.target.checked;moveMarkers();});
+    if($('showAllMarkers')) $('showAllMarkers').addEventListener('change',e=>{state.showAllMarkers=e.target.checked;moveMarkers();});
   }
   // Native tooltip: hover, focus, tap/click with Escape handling.
   function showTooltip(anchor){if(!anchor?.dataset?.tip)return;tooltipAnchor=anchor;const box=$('tooltip');box.textContent=anchor.dataset.tip;box.hidden=false;const r=anchor.getBoundingClientRect();const w=Math.min(320,window.innerWidth-28);let x=r.left+r.width/2-w/2;x=Math.max(12,Math.min(x,window.innerWidth-w-12));let y=r.bottom+9;if(y+120>window.innerHeight)y=Math.max(8,r.top-130);box.style.left=`${x}px`;box.style.top=`${y}px`;box.style.width=`${w}px`;}
   function hideTooltip(){if(tooltipAnchor)tooltipAnchor=null;$('tooltip').hidden=true;}
   function setupTooltips(){
-    document.querySelectorAll('.help').forEach(el=>{
-      el.addEventListener('mouseenter',()=>showTooltip(el));el.addEventListener('mouseleave',hideTooltip);
-      el.addEventListener('focus',()=>showTooltip(el));el.addEventListener('blur',hideTooltip);
-      el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();showTooltip(el);});
+    // Event delegation supports tyre help buttons redrawn when the lap changes.
+    document.addEventListener('pointerover',event=>{
+      const help=event.target.closest?.('.help');if(help)showTooltip(help);
     });
-    document.addEventListener('pointerdown',e=>{if(!e.target.closest('.help'))hideTooltip();});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'){hideTooltip();}});
+    document.addEventListener('pointerout',event=>{
+      const help=event.target.closest?.('.help');
+      if(help && !help.contains(event.relatedTarget))hideTooltip();
+    });
+    document.addEventListener('focusin',event=>{
+      const help=event.target.closest?.('.help');if(help)showTooltip(help);
+    });
+    document.addEventListener('focusout',event=>{
+      const help=event.target.closest?.('.help');if(help)hideTooltip();
+    });
+    document.addEventListener('click',event=>{
+      const help=event.target.closest?.('.help');
+      if(help){event.preventDefault();event.stopPropagation();showTooltip(help);}
+    },true);
+    document.addEventListener('pointerdown',event=>{if(!event.target.closest?.('.help'))hideTooltip();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape')hideTooltip();});
   }
   function drawQualChart(a,b){
     const svg=$('qualChart'),ns='http://www.w3.org/2000/svg';svg.innerHTML='';
@@ -299,21 +310,20 @@
     add('text',{x:440,y:38,fill:'#73e1d5','font-size':11},'● Example A');add('text',{x:535,y:38,fill:'#87b8ff','font-size':11},'● Example B');
   }
   function setupTask(){
-    const task='You missed the 2025 Las Vegas Grand Prix. Using this interface only: go to lap 2 and compare Lewis Hamilton with Charles Leclerc. Who was ahead? Discover what “pit stop” means using the question-mark help, then find which driver stopped first. In the same comparison, which driver had the quicker best Sector 1 time? Finally, explore qualifying: did Hamilton reach Q2, and who was quicker in Q1?';
-    $('copyTask').addEventListener('click',async()=>{
+    const task='You missed the 2025 Las Vegas Grand Prix. Go to lap 2 and compare Lewis Hamilton with Charles Leclerc. Who was ahead? Which driver stopped first? Who had the quicker best Sector 1 time? In qualifying, did Hamilton reach Q2, and who was quicker in Q1?';
+    if($('copyTask')) $('copyTask').addEventListener('click',async()=>{
       try{await navigator.clipboard.writeText(task);$('copyTask').textContent='Copied participant prompt ✓';}
       catch{const t=document.createElement('textarea');t.value=task;document.body.append(t);t.select();document.execCommand('copy');t.remove();$('copyTask').textContent='Copied participant prompt ✓';}
     });
-    $('resetTest').addEventListener('click',()=>{document.querySelectorAll('.test-scoring input[type=checkbox]').forEach(el=>el.checked=false);});
+    if($('resetTest')) $('resetTest').addEventListener('click',()=>{document.querySelectorAll('.test-scoring input[type=checkbox]').forEach(el=>el.checked=false);});
     const names={qualifying:'FIA qualifying',pits:'FIA pit details',lapChart:'FIA lap checkpoints',history:'FIA timing gaps',result:'F1 official result',tyre:'Tyre strategy',sectors:'Best sectors'};
-    $('sourceLinks').innerHTML=Object.entries(names).map(([key,name])=>`<a href="${RACE.sources[key]}" target="_blank" rel="noopener noreferrer">${name} ↗</a>`).join('');
+    if($('sourceLinks')) $('sourceLinks').innerHTML=Object.entries(names).map(([key,name])=>`<a href="${RACE.sources[key]}" target="_blank" rel="noopener noreferrer">${name} ↗</a>`).join('');
   }
   function attachHandlers(){
     document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>setView(btn.dataset.view)));
     $('playBtn').addEventListener('click',play);$('lapSlider').addEventListener('input',e=>{pause();setLap(Number(e.target.value));});
     $('lapBack').addEventListener('click',()=>{pause();setLap(state.lap-1);});$('lapForward').addEventListener('click',()=>{pause();setLap(state.lap+1);});
     $('previewBtn').addEventListener('click',()=>{pause();setLap(24);});
-    $('eventShortcuts').addEventListener('click',e=>{const btn=e.target.closest('[data-lap]');if(!btn)return;pause();setLap(Number(btn.dataset.lap));});
     $('driverSelect').addEventListener('change',e=>focus(e.target.value));$('focusSelect').addEventListener('change',e=>focus(e.target.value));
     $('compareBSelect').addEventListener('change',e=>{state.compared=e.target.value;if(state.compared===state.focused){state.compared=state.focused==='HAM'?'LEC':'HAM';$('compareBSelect').value=state.compared;}renderComparison();moveMarkers();});
     $('compareToggle').addEventListener('click',()=>setCompare(!state.showCompare));$('compareClose').addEventListener('click',()=>setCompare(false));
@@ -333,7 +343,7 @@
     configureTyres();setupMap();setupTooltips();setupTask();
   }
   function init(){
-    populateEvents();buildSelect($('driverSelect'),state.focused);buildSelect($('focusSelect'),state.focused);buildSelect($('compareBSelect'),state.compared);
+    buildSelect($('driverSelect'),state.focused);buildSelect($('focusSelect'),state.focused);buildSelect($('compareBSelect'),state.compared);
     buildSelect($('qualA'),state.qualA);buildSelect($('qualB'),state.qualB);
     attachHandlers();renderReplay();renderQualifying();setView('race');
     // Make basic checks available to a browser-based test runner.
