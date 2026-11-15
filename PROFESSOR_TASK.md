@@ -28,9 +28,9 @@ Record total time ______ ; first hesitation ______ ; incorrect click(s) ______ ;
 
 ## Optional second task: controls and interpretation (3–5 minutes)
 
-> Use the tyre checkboxes to show only drivers on Medium tyres, then show All again. Use a race-event shortcut to move to lap 24, and find Charles Leclerc on the map or running order. Now zoom the track, reset it, and return to qualifying. Select Q2 to highlight it and explain why Hamilton has no time there. What does the speed chart tell you—and what does it **not** claim to measure?
+> Use the tyre checkboxes to show only drivers on Medium tyres, then clear the filter. Use the lap slider to move to lap 24, and find Charles Leclerc on the map or running order. Now zoom the track, reset it, and return to qualifying. Select Q2 to highlight it and explain why Hamilton has no time there. What does the speed chart tell you—and what does it **not** claim to measure?
 
-Look for whether tyre filters affect the running order and markers, and whether the distinction between recorded history and schematic visualization is understood.
+Check that the filter changes the matching-driver list while all 20 drivers remain visible and selectable on the map and in the running order.
 
 ## Answer key (observer only; do not disclose during task)
 
