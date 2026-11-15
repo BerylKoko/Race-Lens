@@ -9,8 +9,8 @@ Open **`index.html`** in a modern web browser. No build, sign-in, internet conne
 - Replays a **2025 Las Vegas Grand Prix** reference event with a working 50-lap slider, play/pause, step controls, and verified *selected* historic position checkpoints (other laps transparently reuse the last verified checkpoint).
 - Interactive schematic circuit with selectable driver markers, drag-to-pan, zoom/reset and an all-markers toggle.
 - Running order, clickable driver selection, current tyre filters using **All / Soft / Medium / Hard checkboxes**, summaries, stop events and race annotations.
-- Integrated **Driver Focus** with driver selector beside heading, optional **Compare** disclosure, paired driver cards, evidence-based comparisons, and explanatory `?` tooltips.
-- Qualifying guide defining **Q1/Q2/Q3** distinctly from **S1/S2/S3**; two-driver Q-session chart and round-by-round differences sourced from official FIA qualifying classification.
+- Integrated **Driver Focus** with the selector immediately beside its heading, optional **Compare** disclosure, paired driver cards, compact **Q1/Q2/Q3 and S1/S2/S3** comparisons, evidence-based differences, and contextual `?` tooltips beside F1 concepts **and navigation controls**.
+- Qualifying guide defining **Q1/Q2/Q3** distinctly from **S1/S2/S3**; two-driver Q-session chart, selectable Q1/Q2/Q3 round highlights, and round-by-round differences sourced from official FIA qualifying classification. Opening it from Driver Focus preserves the chosen pair and offers a direct return to Driver Focus.
 - Verified *best race sector* comparison for drivers for whom reference data is available (best S1/S2/S3 may come from different laps).
 - Clearly labeled **schematic** speed / brake / throttle visual teaching demo; never passed off as actual telemetry.
 - Research notes, source links, a participant scenario and observer checklist within the prototype.
@@ -23,9 +23,9 @@ The design explores whether **progressive disclosure** reduces the burden of int
 
 ## Test task for Prof. Huang
 
-> You missed the 2025 Las Vegas Grand Prix. Using this interface only: on lap 2, who was ahead—Lewis Hamilton or Charles Leclerc? Which of them made their first pit stop earlier, and on what laps? Then check qualifying: did Hamilton reach Q2, and who set the quicker Q1 lap?
+A short think-aloud task in [`PROFESSOR_TASK.md`](PROFESSOR_TASK.md) covers the integrated Driver Focus comparison, pit-stop `?` help, S1 sector comparison and qualifying Q1/Q2/Q3. An optional second task tests tyre filters, map pan/zoom and interpretation of schematic vs recorded data. The prototype also contains a copyable participant prompt and observer-only answer disclosure.
 
-Observer answers: At lap 2, **Leclerc P8** vs **Hamilton P12**. Leclerc first stops on **lap 24**, Hamilton on **lap 29**. Hamilton was eliminated in **Q1** (`1:57.115`); Leclerc's Q1 `1:54.814` was **2.301 seconds** quicker. Encourage think-aloud; log time, wrong turns, and whether explanations are sufficient without external guidance. The *Study notes & test* tab contains a printable/copyable prompt and interactive checklist.
+A trace from the **November 2 design feedback** to the implemented screens and verification steps is in [`FEEDBACK_TRACE.md`](FEEDBACK_TRACE.md).
 
 ## Data sources
 
@@ -38,5 +38,3 @@ Observer answers: At lap 2, **Leclerc P8** vs **Hamilton P12**. Leclerc first st
 7. [Historical F1 sectors — best race sectors](https://en.mclarenf-1.com/2025/gp/1169/)
 
 Independent study prototype; for educational use, not affiliated with Formula 1 or FIA.
-
-**GitHub Pages deployment:** the website loads the four modular files `index.html`, `styles.css`, `data.js` and `app.js`. The downloadable package also provides a single-file standalone HTML alternative.
