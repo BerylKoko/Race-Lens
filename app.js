@@ -7,7 +7,7 @@
     view:'race', lap:2, focused:'HAM', compared:'LEC', showCompare:false,
     qualA:'NOR', qualB:'VER', tyreFilters:new Set(['All']), playing:false,
     showAllMarkers:false, mapScale:1, panX:0, panY:0, dragging:false,
-    speedMetric:'speed'
+    speedMetric:'speed', selectedSession:0
   };
   let playTimer=null, dragStart=null, tooltipAnchor=null;
   const firstName = (d) => d.name.split(' ')[0];
@@ -146,6 +146,27 @@
       $('compareTrend').textContent=`Checked time-gap trend: the pair gap has ${Math.abs(difference)<.0005?'stayed level':difference>0?'widened':'narrowed'} by ${fmt(Math.abs(difference))}s since lap ${earlier}.`;
     }else $('compareTrend').textContent='Lap-by-lap time delta not available from the sampled timing checkpoints at this lap.';
     $('compareEvidence').textContent=typeof gapA==='number'&&typeof gapB==='number'?'Timing comparison uses verified FIA gaps to the same race leader at this lap.':`Exact pairwise timing gap not checked for lap ${state.lap}. Position order comes from lap ${cp}; no synthetic time difference is displayed.`;
+    renderInlineTiming(a,b);
+  }
+  function renderInlineTiming(a,b){
+    const rows=(kind)=>['Q1','Q2','Q3'].map((round,i)=>{
+      const x=sec(a.q[i]),y=sec(b.q[i]);
+      const outcome=x!==null&&y!==null ? `${(x<y?a:b).code} faster by ${fmt(Math.abs(x-y))}s` :
+        x===null&&y===null ? 'No times recorded for either' : `${x===null?a.code:b.code}: did not qualify for ${round}`;
+      return `<div class="inline-timing-row"><b>${round}</b><span>${a.code} ${a.q[i]||'—'} · ${b.code} ${b.q[i]||'—'}</span><strong>${outcome}</strong></div>`;
+    });
+    $('inlineQualRows').innerHTML=rows().join('');
+    const sa=SECTORS[a.code],sb=SECTORS[b.code];
+    if(sa&&sb){
+      $('inlineSectorRows').innerHTML=[0,1,2].map(i=>{
+        const quicker=sa[i]<sb[i]?a:b;
+        return `<div class="inline-timing-row"><b>S${i+1}</b><span>${a.code} ${fmt(sa[i])}s · ${b.code} ${fmt(sb[i])}s</span><strong>${quicker.code} faster by ${fmt(Math.abs(sa[i]-sb[i]))}s</strong></div>`;
+      }).join('');
+    }else $('inlineSectorRows').innerHTML='<p class="quiet-small">Not available for both selected drivers. No sector times inferred.</p>';
+    const q1a=sec(a.q[0]),q1b=sec(b.q[0]);
+    const q1Line=q1a!==null&&q1b!==null?`In Q1, ${(q1a<q1b?a:b).name} was ${fmt(Math.abs(q1a-q1b))}s quicker.`:'A directly comparable Q1 result is not available.';
+    const sectorLine=sa&&sb?`In each driver’s best recorded race S1, ${(sa[0]<sb[0]?a:b).name} was ${fmt(Math.abs(sa[0]-sb[0]))}s quicker.`:'Best race-sector comparison is not available for this pair.';
+    $('inlineTimingSummary').textContent=`${q1Line} ${sectorLine} Qualifying sessions and best race sectors are separate measurements.`;
   }
   function renderReplay(){
     for(const id of ['lapNumber','snapshotLap','fieldLap','mapLap'])$(id).textContent=state.lap;
@@ -204,6 +225,7 @@
     if(!times.length){make('text',{x:90,y:130,class:'chart-text'},'No timing data');return;}
     const low=Math.floor(Math.min(...times)-1),high=Math.ceil(Math.max(...times)+1);
     const y=v=>bottom-(v-low)/(high-low)*(bottom-top),x=i=>left+(right-left)*i/2;
+    make('rect',{x:x(state.selectedSession)-42,y:top-18,width:84,height:bottom-top+27,rx:9,fill:'#244d52',opacity:.5});
     for(let k=0;k<=4;k++){let val=low+(high-low)*(k/4);const py=y(val);make('line',{x1:left,y1:py,x2:right,y2:py,class:'chart-grid'});make('text',{x:5,y:py+4,class:'chart-text'},`${val.toFixed(1)}s`);}
     ['Q1','Q2','Q3'].forEach((n,i)=>make('text',{x:x(i),y:bottom+30,'text-anchor':'middle',class:'chart-text'},n));
     [{d:a,color:'#73e1d5'},{d:b,color:'#87b8ff'}].forEach(({d,color})=>{
@@ -220,6 +242,14 @@
     $('qualLegend').innerHTML=`<span><i class="line-swatch" style="background:#73e1d5"></i>${a.name}</span><span><i class="line-swatch" style="background:#87b8ff"></i>${b.name}</span>`;
     $('qualChart').setAttribute('aria-label',`Qualifying sessions for ${a.name} and ${b.name}`);
     drawQualChart(a,b);
+    document.querySelectorAll('[data-session]').forEach(btn=>{const selected=Number(btn.dataset.session)===state.selectedSession;btn.classList.toggle('active',selected);btn.setAttribute('aria-pressed',String(selected));});
+    const round=['Q1','Q2','Q3'][state.selectedSession];
+    const ta=sec(a.q[state.selectedSession]),tb=sec(b.q[state.selectedSession]);
+    $('selectedSessionResult').textContent=ta!==null&&tb!==null
+      ? `${round}: ${(ta<tb?a:b).name} set a ${fmt(Math.abs(ta-tb))}s faster lap (${a.code}: ${a.q[state.selectedSession]} · ${b.code}: ${b.q[state.selectedSession]}).`
+      : ta===null&&tb===null?`${round}: neither selected driver set a time in this round.`
+      : `${round}: ${ta===null?a.name:b.name} has no time in this round; ${ta===null?b.name:a.name} recorded ${ta===null?b.q[state.selectedSession]:a.q[state.selectedSession]}. A missing qualifying time is not zero.`;
+
     $('sessionDetails').innerHTML=['Q1','Q2','Q3'].map((q,i)=>`<div class="session-chip"><strong>${q}</strong><small>${a.code}: ${a.q[i]||'Eliminated'}</small><small>${b.code}: ${b.q[i]||'Eliminated'}</small></div>`).join('');
     const available=[];
     $('qualDifferences').innerHTML=['Q1','Q2','Q3'].map((q,i)=>{
@@ -228,7 +258,14 @@
       else{result=ta===null&&tb===null?'Neither driver reached this round':`${ta===null?a.name:b.name} did not reach ${q}`;detail=`No head-to-head time comparison in ${q}`;}
       return `<div class="session-result"><small>${q} · ${i===0?'20 runners':i===1?'15 runners':'Top 10'}</small><strong>${result}</strong><span>${detail}</span></div>`;
     }).join('');
-    const first=available[0];$('qualTakeaway').textContent=first?`At ${['Q1','Q2','Q3'][first.i]}, ${first.quicker.name} was ${fmt(first.diff)}s faster than ${first.quicker.code===a.code?b.name:a.name}. Compare qualifying rounds below.`:'These two drivers have no shared qualifying round with a recorded lap.';
+    const selectedResult=available.find(item=>item.i===state.selectedSession);
+    const selectedName=['Q1','Q2','Q3'][state.selectedSession];
+    const earlierShared=available[0];
+    $('qualTakeaway').textContent=selectedResult
+      ? `In ${selectedName}, ${selectedResult.quicker.name} was ${fmt(selectedResult.diff)}s faster than ${selectedResult.quicker.code===a.code?b.name:a.name}. Explore the full session-by-session comparison below.`
+      : earlierShared
+        ? `No head-to-head time is available in ${selectedName}. Their earliest shared qualifying round was ${['Q1','Q2','Q3'][earlierShared.i]}, where ${earlierShared.quicker.name} was ${fmt(earlierShared.diff)}s quicker.`
+        : `Neither selected driver has a shared qualifying time to compare in ${selectedName}.`;
     const q3Both=a.q[2]&&b.q[2];
     $('qualExplainer').textContent=`${a.name} ${a.q[1]?'advanced to Q2':'was eliminated after Q1'}, while ${b.name} ${b.q[1]?'advanced to Q2':'was eliminated after Q1'}. ${q3Both?'Both reached Q3, where the quickest final-session lap affects the top-ten starting order.':'A missing later time is an elimination, not a slow lap.'} Qualifying is a separate session from Sunday’s race.`;
     renderSectors(a,b);drawSpeed();
@@ -262,7 +299,7 @@
     add('text',{x:440,y:38,fill:'#73e1d5','font-size':11},'● Example A');add('text',{x:535,y:38,fill:'#87b8ff','font-size':11},'● Example B');
   }
   function setupTask(){
-    const task='You missed the 2025 Las Vegas Grand Prix. Using this interface only: on lap 2, who was ahead—Lewis Hamilton or Charles Leclerc? Which of them made their first pit stop earlier, and on what laps? Then check qualifying: did Hamilton reach Q2, and who set the quicker Q1 lap?';
+    const task='You missed the 2025 Las Vegas Grand Prix. Using this interface only: go to lap 2 and compare Lewis Hamilton with Charles Leclerc. Who was ahead? Discover what “pit stop” means using the question-mark help, then find which driver stopped first. In the same comparison, which driver had the quicker best Sector 1 time? Finally, explore qualifying: did Hamilton reach Q2, and who was quicker in Q1?';
     $('copyTask').addEventListener('click',async()=>{
       try{await navigator.clipboard.writeText(task);$('copyTask').textContent='Copied participant prompt ✓';}
       catch{const t=document.createElement('textarea');t.value=task;document.body.append(t);t.select();document.execCommand('copy');t.remove();$('copyTask').textContent='Copied participant prompt ✓';}
@@ -280,6 +317,15 @@
     $('driverSelect').addEventListener('change',e=>focus(e.target.value));$('focusSelect').addEventListener('change',e=>focus(e.target.value));
     $('compareBSelect').addEventListener('change',e=>{state.compared=e.target.value;if(state.compared===state.focused){state.compared=state.focused==='HAM'?'LEC':'HAM';$('compareBSelect').value=state.compared;}renderComparison();moveMarkers();});
     $('compareToggle').addEventListener('click',()=>setCompare(!state.showCompare));$('compareClose').addEventListener('click',()=>setCompare(false));
+    $('explorePairBtn').addEventListener('click',()=>{
+      state.qualA=state.focused;state.qualB=state.compared;
+      $('qualA').value=state.qualA;$('qualB').value=state.qualB;
+      setView('qualifying');
+    });
+    $('backToFocus').addEventListener('click',()=>{setView('race');$('driverFocus').scrollIntoView({block:'start',behavior:'smooth'});});
+    document.querySelectorAll('[data-session]').forEach(btn=>btn.addEventListener('click',()=>{
+      state.selectedSession=Number(btn.dataset.session);renderQualifying();
+    }));
     document.addEventListener('click',e=>{const btn=e.target.closest('[data-focus]');if(btn)focus(btn.dataset.focus);});
     $('qualA').addEventListener('change',e=>{state.qualA=e.target.value;if(state.qualA===state.qualB){state.qualB=state.qualA==='NOR'?'VER':'NOR';$('qualB').value=state.qualB;}renderQualifying();});
     $('qualB').addEventListener('change',e=>{state.qualB=e.target.value;if(state.qualB===state.qualA){state.qualB=state.qualA==='VER'?'NOR':'VER';$('qualB').value=state.qualB;}renderQualifying();});
