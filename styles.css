@@ -1939,7 +1939,7 @@ strong {
   font-size: 28px;
 }
 .focus-section-title {
-  font-size: 22px!important;
+  font-size: 52px!important;
 }
 .focus-identity h3 {
   font-size: 32px;
@@ -2051,7 +2051,7 @@ strong {
   margin-top: 12px;
 }
 .focus-identity h3 {
-  font-size: 48px;
+  font-size: 40px;
   line-height: 1.05;
   margin: 0;
 }
@@ -2147,6 +2147,9 @@ strong {
   min-width: 320px;
 }
 @media(max-width:690px) {
+  .focus-section-title {
+    font-size: 36px!important;
+  }
   .simple-header h1 {
     font-size: 28px;
   }
@@ -2154,7 +2157,7 @@ strong {
     font-size: 14px;
   }
   .focus-identity h3 {
-    font-size: 36px;
+    font-size: 29px;
   }
   .position-pill {
     font-size: 14px;
