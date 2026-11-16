@@ -63,3 +63,32 @@
 /* refinement pass */
 .simple-header h1{font-size:34px}.simple-header small{font-size:17px}
 .focus-top{justify-content:space-between;align-items:flex-start;gap:18px}.focus-actions{display:flex;align-items:flex-start;gap:12px}.focus-title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.focus-identity{margin-top:12px}.focus-identity h3{font-size:48px;line-height:1.05;margin:0}.focus-identity p{font-size:16px}.position-pill{font-size:16px;padding:10px 14px;margin-top:3px}.insight{background:none!important;border:none!important;padding:0!important;margin:14px 0 18px!important;color:#e9f1f7!important;font-size:30px!important;font-weight:800;line-height:1.25}.compare-takeaway{background:none!important;border:none!important;padding:0!important;margin:10px 0 18px!important;color:#eef4f8!important;font-size:34px!important;font-weight:820;line-height:1.2}.inline-comparison-summary{font-size:24px!important;font-weight:760;line-height:1.35}.filter-checks{grid-template-columns:1fr!important;gap:10px!important}.filter-checks label{display:grid!important;grid-template-columns:20px auto 18px;justify-content:start;align-items:center;column-gap:10px;white-space:normal!important}.filter-checks .help{margin-left:0!important}.timeline-controls .select-control.compact{min-width:190px;max-width:220px}.panel-heading h2{font-size:26px}.inline-timing-grid{grid-template-columns:1fr!important}.inline-timing-card h4{font-size:28px}.inline-timing-row{grid-template-columns:55px minmax(0,1fr)!important;row-gap:8px}.inline-timing-row b{font-size:24px}.inline-timing-row span{font-size:28px;line-height:1.2}.inline-timing-row strong{grid-column:2;font-size:22px}.inline-metrics-intro strong{font-size:28px}.inline-metrics-intro p{font-size:16px}.compare-person strong{font-size:26px}.compare-person span,.compare-person label{font-size:15px}.focus-header-picker{min-width:320px}@media(max-width:690px){.simple-header h1{font-size:28px}.simple-header small{font-size:14px}.focus-identity h3{font-size:36px}.position-pill{font-size:14px;padding:8px 12px}.insight{font-size:24px!important}.compare-takeaway{font-size:28px!important}.inline-comparison-summary{font-size:20px!important}.inline-timing-row b{font-size:20px}.inline-timing-row span{font-size:22px}.inline-timing-row strong{font-size:18px}.timeline-controls .select-control.compact{min-width:160px}.focus-actions{width:auto}}
+
+
+/* 2026-11-15 usability fixes: clear static race header, stable lap picker, no control collisions */
+.simple-header{padding:18px 29px!important}
+.simple-header h1{font-size:28px!important;line-height:1.2!important;font-weight:750!important;letter-spacing:-.025em!important}
+.race-context{color:#e0e9f1;font-size:17px;font-weight:650;letter-spacing:0;margin:0 0 15px!important}
+.toolbar{padding-top:22px!important}
+.toolbar-topline{display:block}
+.toolbar h2{display:none}
+.lap-jump{display:flex;align-items:center;gap:10px;white-space:nowrap;flex-shrink:0}
+.lap-jump label{font-size:13px;font-weight:700;color:#d6e3ec}
+.lap-jump select{min-width:150px;max-width:190px;background:#1a2938;color:#f2f8fc;border:1px solid #52697c;padding:10px 12px;border-radius:8px;font-size:14px}
+.lap-jump select option{background:#14202e;color:#f4f9fc}
+.filter-checks{display:flex!important;flex-direction:column!important;gap:8px!important;grid-template-columns:none!important;width:100%;min-width:0}
+.tyre-filter-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-width:0;min-height:42px}
+.filter-checks .tyre-filter-row label,.filter-checks .tyre-filter-row label:first-child{display:flex!important;align-items:center;gap:10px!important;margin:0;flex:1;min-width:0;width:auto;font-size:15px!important;white-space:nowrap!important;cursor:pointer}
+.tyre-filter-row label input{margin:0;flex:0 0 18px;width:18px;height:18px}
+.tyre-filter-row .tyre-dot{flex:0 0 11px;width:11px;height:11px;margin:0!important}
+.tyre-filter-row .help{flex:0 0 22px!important;width:22px;height:22px;margin:0!important;font-size:13px}
+.tyre-summary{display:block!important;min-height:125px;margin:15px 0 23px}
+.tyre-summary .tyre-line{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;font-size:16px;margin:12px 0 7px}
+.tyre-summary .tyre-line span{font-size:16px!important;display:flex;align-items:center;gap:6px}
+.tyre-summary .tyre-line b{font-size:17px;color:#f1f7fb}
+.tyre-summary .tyre-bar{height:6px;margin-bottom:15px}
+.snapshot-panel{overflow:visible}
+.filter-title{margin-top:23px!important}
+.filter-results{min-height:0!important}
+@media(max-width:960px){.snapshot-panel{display:block!important}.snapshot-panel .section-divider{display:block!important}}
+@media(max-width:690px){.timeline-controls{flex-wrap:wrap}.lap-jump{flex:1 1 100%;justify-content:flex-start;margin:7px 0 0}.lap-jump select{flex:1;max-width:260px}.running-list{max-height:none!important}.simple-header h1{font-size:25px!important}}
