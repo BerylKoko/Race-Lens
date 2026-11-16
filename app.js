@@ -274,15 +274,15 @@
         $('focusTeam').textContent = d.team;
         $('focusPosition').textContent = p ? `P${p}` : 'OUT';
         $('focusTyre').textContent = tyreDisplay(d);
-        $('focusGap').textContent = formatGap(d.code);
+        $('focusGap').textContent = knownGap(d.code) === null ? '—' : formatGap(d.code);
         $('focusPit').textContent = pitText(d);
         $('focusLap').textContent = `Lap ${state.lap} / ${RACE.totalLaps}`;
         $('mapDriver').textContent = d.name;
         const ownGap = knownGap(d.code), nextGap = DRIVERS.filter(x => x.code !== d.code && isActive(x)).map(x => knownGap(x.code)).filter(x => typeof x === 'number' && x > 0).sort((a, b) => a - b)[0];
         $('focusInsight').textContent = !isActive(d) ? `${d.name} is out of the race.` :
-            ownGap === 0 ? `${d.name} is P1.${typeof nextGap === 'number' ? ` ${fmtShort(nextGap)} seconds ahead of second place.` : ' Gap to leader: 0.0 seconds.'}` :
+            ownGap === 0 ? `${d.name} is P1.${typeof nextGap === 'number' ? ` ${fmtShort(nextGap)} seconds ahead of second place.` : ''}` :
                 typeof ownGap === 'number' ? `${d.name} is P${p} and ${fmtShort(ownGap)} seconds behind the leader.` :
-                    `${d.name} is P${p}. Race gap time is unavailable for lap ${state.lap}.`;
+                    `${d.name} is P${p}.`;
         $('compareToggle').setAttribute('aria-expanded', String(state.showCompare));
         $('compareInline').classList.toggle('hidden', !state.showCompare);
         $('compareInline').setAttribute('aria-hidden', String(!state.showCompare));
