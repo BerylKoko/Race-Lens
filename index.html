@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#090e17">
   <meta name="description" content="A simplified novice-friendly F1 race replay and qualifying prototype.">
   <title>Las Vegas Grand Prix 2025 Prototype</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261115-layout4">
 </head>
 <body>
 <div id="app" class="app">
   <header class="site-header simple-header">
-    <div><h1>Race Replay Explorer <small>Las Vegas Grand Prix · 2025</small></h1></div>
+    <div><h1>F1 Interface Prototype</h1></div>
   </header>
 
   <nav class="top-tabs" aria-label="Primary views">
@@ -22,13 +22,13 @@
   <main>
     <section id="raceView" class="view active" aria-label="Historical race replay">
       <div class="toolbar">
-        <div class="toolbar-topline"><div><h2>Las Vegas Grand Prix <span class="year">2025</span></h2></div></div>
+        <div class="toolbar-topline"><p class="race-context">2025 Las Vegas Grand Prix</p></div>
         <div class="timeline-controls"><button id="playBtn" class="primary-btn" type="button" aria-label="Play lap replay"><span id="playIcon">▶</span><span id="playText">Play replay</span></button>
           <div class="lap-indicator">LAP <b id="lapNumber">2</b><span>/ 50</span></div>
           <button id="lapBack" class="icon-btn" type="button" aria-label="Go back one lap">‹</button>
           <input type="range" id="lapSlider" min="1" max="50" value="2" aria-label="Selected lap, from 1 to 50">
           <button id="lapForward" class="icon-btn" type="button" aria-label="Go forward one lap">›</button>
-          <label class="visually-hidden" for="quickLapSelect">Jump to lap</label><select id="quickLapSelect" class="select-control compact" aria-label="Jump to a lap"><option value="">Jump to lap…</option></select>
+          <div class="lap-jump"><label for="quickLapSelect">Jump to lap</label><select id="quickLapSelect" class="select-control compact" aria-label="Jump to a lap"><option value="">Choose a lap</option><option value="1">Lap 1</option><option value="2">Lap 2</option><option value="3">Lap 3</option><option value="4">Lap 4</option><option value="5">Lap 5</option><option value="6">Lap 6</option><option value="7">Lap 7</option><option value="8">Lap 8</option><option value="9">Lap 9</option><option value="10">Lap 10</option><option value="11">Lap 11</option><option value="12">Lap 12</option><option value="13">Lap 13</option><option value="14">Lap 14</option><option value="15">Lap 15</option><option value="16">Lap 16</option><option value="17">Lap 17</option><option value="18">Lap 18</option><option value="19">Lap 19</option><option value="20">Lap 20</option><option value="21">Lap 21</option><option value="22">Lap 22</option><option value="23">Lap 23</option><option value="24">Lap 24</option><option value="25">Lap 25</option><option value="26">Lap 26</option><option value="27">Lap 27</option><option value="28">Lap 28</option><option value="29">Lap 29</option><option value="30">Lap 30</option><option value="31">Lap 31</option><option value="32">Lap 32</option><option value="33">Lap 33</option><option value="34">Lap 34</option><option value="35">Lap 35</option><option value="36">Lap 36</option><option value="37">Lap 37</option><option value="38">Lap 38</option><option value="39">Lap 39</option><option value="40">Lap 40</option><option value="41">Lap 41</option><option value="42">Lap 42</option><option value="43">Lap 43</option><option value="44">Lap 44</option><option value="45">Lap 45</option><option value="46">Lap 46</option><option value="47">Lap 47</option><option value="48">Lap 48</option><option value="49">Lap 49</option><option value="50">Lap 50</option></select></div>
         </div>
       </div>
 
@@ -38,12 +38,12 @@
           <p class="muted" id="fieldCount">20 entered · 19 running at lap 2</p>
           <div class="section-divider"></div>
           <div class="row spread gap-sm"><h3>Tyres on the field</h3></div>
-          <div class="tyre-summary" id="tyreSummary"></div>
+          <div class="tyre-summary" id="tyreSummary"><div class="tyre-line"><span><i class="tyre-dot soft"></i>Soft</span><b>0</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:0%;background:#f36b8f"></span></div><div class="tyre-line"><span><i class="tyre-dot medium"></i>Medium</span><b>10</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:53%;background:#f5d275"></span></div><div class="tyre-line"><span><i class="tyre-dot hard"></i>Hard</span><b>8</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:42%;background:#ecf3f9"></span></div></div>
           <h3 class="filter-title">Show drivers on…</h3>
           <div class="filter-checks" id="tyreFilters" role="group" aria-label="Filter drivers by tyre compound">
-            <label><input type="checkbox" name="tyre" value="Soft"><span class="tyre-dot soft"></span>Soft <button class="help inline-help" type="button" aria-label="What is a soft tyre?" data-tip="Soft: fastest grip, but it wears out the quickest.">?</button></label>
-            <label><input type="checkbox" name="tyre" value="Medium"><span class="tyre-dot medium"></span>Medium <button class="help inline-help" type="button" aria-label="What is a medium tyre?" data-tip="Medium: a balance between speed and tyre life.">?</button></label>
-            <label><input type="checkbox" name="tyre" value="Hard"><span class="tyre-dot hard"></span>Hard <button class="help inline-help" type="button" aria-label="What is a hard tyre?" data-tip="Hard: slower, but it lasts the longest.">?</button></label>
+            <div class="tyre-filter-row"><label for="tyreSoft"><input id="tyreSoft" type="checkbox" name="tyre" value="Soft"><span class="tyre-dot soft"></span><span>Soft</span></label><button class="help inline-help" type="button" aria-label="What is a soft tyre?" data-tip="Soft: the quickest tyres. They wear out faster.">?</button></div>
+            <div class="tyre-filter-row"><label for="tyreMedium"><input id="tyreMedium" type="checkbox" name="tyre" value="Medium"><span class="tyre-dot medium"></span><span>Medium</span></label><button class="help inline-help" type="button" aria-label="What is a medium tyre?" data-tip="Medium: a balance of speed and tyre life.">?</button></div>
+            <div class="tyre-filter-row"><label for="tyreHard"><input id="tyreHard" type="checkbox" name="tyre" value="Hard"><span class="tyre-dot hard"></span><span>Hard</span></label><button class="help inline-help" type="button" aria-label="What is a hard tyre?" data-tip="Hard: slower tyres that last longer.">?</button></div>
           </div>
           <div class="filter-results" id="filterResults" aria-live="polite"></div>
           <div class="section-divider"></div>
@@ -130,7 +130,7 @@
   </main>
   <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
 </div>
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script src="data.js?v=20261115-layout4"></script>
+<script src="app.js?v=20261115-layout4"></script>
 </body>
 </html>
