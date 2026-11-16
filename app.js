@@ -17,7 +17,6 @@
         panX: 0,
         panY: 0,
         dragging: false,
-        speedMetric: 'speed',
         selectedSession: 0
     };
     let playTimer = null, dragStart = null, tooltipAnchor = null;
@@ -532,7 +531,7 @@
             'text-anchor': 'middle',
             class: 'chart-text'
         }, n));
-        [{ d: a, color: '#73e1d5' }, { d: b, color: '#87b8ff' }].forEach(({ d, color }) => {
+        [{ d: a, color: '#73e1d5', index: 0 }, { d: b, color: '#87b8ff', index: 1 }].forEach(({ d, color, index }) => {
             const pts = d.q.map((t, i) => t ? { i, v: sec(t) } : null);
             // Connecting only the sessions in which this driver actually set a time.
             let path = '';
@@ -563,159 +562,90 @@
                     fill: color,
                     class: 'chart-point'
                 });
+                // Separate labels when drivers' times fall close together.
+                const otherTime = sec((index === 0 ? b : a).q[p.i]);
+                const nearOther = otherTime !== null && Math.abs(y(otherTime) - y(p.v)) < 28;
+                const labelY = nearOther ? y(p.v) + (index === 0 ? -16 : 23) : y(p.v) - 12;
                 make('text', {
                     x: x(p.i),
-                    y: y(p.v) - 12,
+                    y: labelY,
                     'text-anchor': 'middle',
                     class: 'chart-label'
                 }, timeString(p.v));
             });
         });
     }
+    // Compare qualifying rounds; drivers who were eliminated have no later times.
     function renderQualifying() {
-        const a = driver(state.qualA), b = driver(state.qualB);
-        $('qualLegend').innerHTML = `<span><i class="line-swatch" style="background:#73e1d5"></i>${a.name}</span><span><i class="line-swatch" style="background:#87b8ff"></i>${b.name}</span>`;
-        $('qualChart').setAttribute('aria-label', `Qualifying sessions for ${a.name} and ${b.name}`);
+        const a = driver(state.qualA);
+        const b = driver(state.qualB);
+        const roundNames = ['Q1', 'Q2', 'Q3'];
+        const round = state.selectedSession;
+
+        $('qualSession').value = String(round);
+        $('qualLegend').innerHTML =
+            `<span><i class="line-swatch" style="background:#73e1d5"></i>${a.name}</span>` +
+            `<span><i class="line-swatch" style="background:#87b8ff"></i>${b.name}</span>`;
+        $('qualChart').setAttribute('aria-label', `Q1, Q2 and Q3 times for ${a.name} and ${b.name}`);
         drawQualChart(a, b);
-        document.querySelectorAll('[data-session]').forEach(btn => {
-            const selected = Number(btn.dataset.session) === state.selectedSession;
-            btn.classList.toggle('active', selected);
-            btn.setAttribute('aria-pressed', String(selected));
-        });
-        const round = ['Q1', 'Q2', 'Q3'][state.selectedSession];
-        const ta = sec(a.q[state.selectedSession]), tb = sec(b.q[state.selectedSession]);
-        $('selectedSessionResult').textContent = ta !== null && tb !== null
-            ? `${round}: ${(ta < tb ? a : b).name} set a ${fmt(Math.abs(ta - tb))}s faster lap (${a.code}: ${a.q[state.selectedSession]} · ${b.code}: ${b.q[state.selectedSession]}).`
-            : ta === null && tb === null ? `${round}: neither selected driver set a time in this round.`
-                : `${round}: ${ta === null ? a.name : b.name} has no time in this round; ${ta === null ? b.name : a.name} recorded ${ta === null ? b.q[state.selectedSession] : a.q[state.selectedSession]}. A missing qualifying time is not zero.`;
-        $('sessionDetails').innerHTML = ['Q1', 'Q2', 'Q3'].map((q, i) => `<div class="session-chip"><strong>${q}</strong><small>${a.code}: ${a.q[i] || 'Eliminated'}</small><small>${b.code}: ${b.q[i] || 'Eliminated'}</small></div>`).join('');
-        const available = [];
-        $('qualDifferences').innerHTML = ['Q1', 'Q2', 'Q3'].map((q, i) => {
-            const ta = sec(a.q[i]), tb = sec(b.q[i]);
-            let result = '', detail = '';
-            if (ta !== null && tb !== null) {
-                const quicker = ta < tb ? a : b;
-                const diff = Math.abs(ta - tb);
-                result = `${quicker.name} quicker by ${fmt(diff)}s`;
-                detail = `${a.code}: ${a.q[i]} · ${b.code}: ${b.q[i]}`;
-                available.push({
-                    i,
-                    quicker,
-                    diff
-                });
+
+        // Fill the three round cards from the same two selected drivers.
+        roundNames.forEach((name, i) => {
+            const ta = sec(a.q[i]);
+            const tb = sec(b.q[i]);
+            const card = document.querySelector(`[data-session="${i}"]`);
+            const bothHaveTimes = ta !== null && tb !== null;
+            let headline;
+
+            if (bothHaveTimes) {
+                const faster = ta < tb ? a : tb < ta ? b : null;
+                headline = faster ? `${faster.name.split(' ')[0]} ${fmt(Math.abs(ta - tb))}s faster` : 'Same time';
+            } else if (ta === null && tb === null) {
+                headline = 'Neither reached this round';
+            } else {
+                headline = `${(ta === null ? a : b).name.split(' ')[0]} eliminated`;
             }
-            else {
-                result = ta === null && tb === null ? 'Neither driver reached this round' : `${ta === null ? a.name : b.name} did not reach ${q}`;
-                detail = `No head-to-head time comparison in ${q}`;
-            }
-            return `<div class="session-result"><small>${q} · ${i === 0 ? '20 runners' : i === 1 ? '15 runners' : 'Top 10'}</small><strong>${result}</strong><span>${detail}</span></div>`;
-        }).join('');
-        const selectedResult = available.find(item => item.i === state.selectedSession);
-        const selectedName = ['Q1', 'Q2', 'Q3'][state.selectedSession];
-        const earlierShared = available[0];
-        $('qualTakeaway').textContent = selectedResult
-            ? `In ${selectedName}, ${selectedResult.quicker.name} was ${fmt(selectedResult.diff)}s faster than ${selectedResult.quicker.code === a.code ? b.name : a.name}. Explore the full session-by-session comparison below.`
-            : earlierShared
-                ? `No head-to-head time is available in ${selectedName}. Their earliest shared qualifying round was ${['Q1', 'Q2', 'Q3'][earlierShared.i]}, where ${earlierShared.quicker.name} was ${fmt(earlierShared.diff)}s quicker.`
-                : `Neither selected driver has a shared qualifying time to compare in ${selectedName}.`;
-        const q3Both = a.q[2] && b.q[2];
-        $('qualExplainer').textContent = `${a.name} ${a.q[1] ? 'advanced to Q2' : 'was eliminated after Q1'}, while ${b.name} ${b.q[1] ? 'advanced to Q2' : 'was eliminated after Q1'}. ${q3Both ? 'Both reached Q3, where the quickest final-session lap affects the top-ten starting order.' : 'A missing later time is an elimination, not a slow lap.'} Qualifying is a separate session from Sunday’s race.`;
-        renderSectors(a, b);
-        drawSpeed();
-    }
-    function renderSectors(a, b) {
-        const sa = SECTORS[a.code], sb = SECTORS[b.code];
-        if (!sa || !sb) {
-            $('sectorBars').innerHTML = '<p class="muted">Best race-sector reference is not available for one of these drivers. Try Norris versus Verstappen or Hamilton versus Leclerc.</p>';
-            $('sectorTakeaway').textContent = 'No inferred sector split is shown.';
-            return;
-        }
-        $('sectorBars').innerHTML = [0, 1, 2].map(i => {
-            const values = [sa[i], sb[i]], small = Math.min(...values), large = Math.max(...values), pct = v => Math.max(44, Math.min(98, 94 - (v - small) * 22));
-            return `<div class="sector-row"><strong>S${i + 1}</strong><div class="sector-lines"><div class="sector-line"><span style="color:#73e1d5">${a.code}</span><div class="bar-bg"><span class="bar-fill" style="background:#73e1d5;width:${pct(sa[i])}%"></span></div><b>${fmt(sa[i])}s</b></div><div class="sector-line"><span style="color:#87b8ff">${b.code}</span><div class="bar-bg"><span class="bar-fill" style="background:#87b8ff;width:${pct(sb[i])}%"></span></div><b>${fmt(sb[i])}s</b></div></div></div>`;
-        }).join('');
-        const diffs = sa.map((v, i) => v - sb[i]);
-        const maxI = diffs.map(Math.abs).indexOf(Math.max(...diffs.map(Math.abs)));
-        const leader = diffs[maxI] < 0 ? a : b;
-        $('sectorTakeaway').textContent = `Largest difference among the best recorded race sectors: S${maxI + 1}, where ${leader.name} was ${fmt(Math.abs(diffs[maxI]))}s quicker. These may be from different laps.`;
-    }
-    function drawSpeed() {
-        const svg = $('speedChart');
-        svg.innerHTML = '';
-        const ns = 'http://www.w3.org/2000/svg';
-        const add = (tag, props, text) => {
-            const el = document.createElementNS(ns, tag);
-            for (const [k, v] of Object.entries(props))
-                el.setAttribute(k, String(v));
-            if (text !== undefined)
-                el.textContent = text;
-            svg.append(el);
-            return el;
-        };
-        const metric = state.speedMetric;
-        const L = 55, T = 25, R = 620, B = 238;
-        for (let k = 0; k <= 4; k++) {
-            let y = T + (B - T) * k / 4;
-            add('line', {
-                x1: L,
-                y1: y,
-                x2: R,
-                y2: y,
-                class: 'chart-grid'
-            });
-        }
-        add('text', {
-            x: L,
-            y: 275,
-            class: 'chart-text'
-        }, 'START OF LAP');
-        add('text', {
-            x: R,
-            y: 275,
-            'text-anchor': 'end',
-            class: 'chart-text'
-        }, 'END OF LAP');
-        const vals = (i, alt) => {
-            const p = i / 80;
-            const peak = 0.67 + 0.29 * Math.sin(p * Math.PI * 6 + .7 + alt * .1);
-            const corner = 0.38 * Math.exp(-Math.pow((p - .20) / .045, 2)) + 0.32 * Math.exp(-Math.pow((p - .61) / .05, 2)) + 0.22 * Math.exp(-Math.pow((p - .83) / .05, 2));
-            if (metric === 'speed')
-                return Math.max(.10, peak - corner + alt * .035);
-            if (metric === 'brake')
-                return Math.max(.04, Math.min(.95, corner * 2.1 + alt * .025));
-            return Math.max(.10, Math.min(.99, 1.05 - corner * 1.6 - (peak < .55 ? .1 : 0) + alt * .02));
-        };
-        [[0, '#73e1d5'], [1, '#87b8ff']].forEach(([alt, color]) => {
-            const points = Array.from({ length: 81 }, (_, i) => {
-                const v = vals(i, alt);
-                return [L + (R - L) * i / 80, B - v * (B - T)];
-            });
-            const d = points.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
-            add('path', {
-                d,
-                stroke: color,
-                'stroke-width': 3,
-                fill: 'none',
-                opacity: .95
-            });
+
+            $(`qual${name}Headline`).textContent = headline;
+            $(`qual${name}Times`).textContent = `${a.code}: ${a.q[i] || '—'} · ${b.code}: ${b.q[i] || '—'}`;
+            card.classList.toggle('active', i === round);
+            card.setAttribute('aria-pressed', String(i === round));
         });
-        add('text', {
-            x: L,
-            y: 15,
-            class: 'chart-text'
-        }, `${metric === 'speed' ? 'SCHEMATIC SPEED' : metric === 'brake' ? 'SCHEMATIC BRAKE INPUT' : 'SCHEMATIC THROTTLE INPUT'} (ARBITRARY UNITS)`);
-        add('text', {
-            x: 440,
-            y: 38,
-            fill: '#73e1d5',
-            'font-size': 11
-        }, '● Example A');
-        add('text', {
-            x: 535,
-            y: 38,
-            fill: '#87b8ff',
-            'font-size': 11
-        }, '● Example B');
+
+        // Explain the currently selected round in one sentence.
+        const timeA = sec(a.q[round]);
+        const timeB = sec(b.q[round]);
+        const selected = roundNames[round];
+        let finding;
+        let note;
+        if (timeA !== null && timeB !== null) {
+            if (timeA === timeB) {
+                finding = `${a.name} and ${b.name} set the same time.`;
+            } else {
+                const quicker = timeA < timeB ? a : b;
+                const other = quicker === a ? b : a;
+                finding = `${quicker.name} was ${fmt(Math.abs(timeA - timeB))}s faster than ${other.name}.`;
+            }
+            note = `Both drivers set a time in ${selected}.`;
+        } else if (timeA === null && timeB === null) {
+            finding = `Neither driver reached ${selected}.`;
+            note = 'Choose an earlier round to compare their recorded times.';
+        } else {
+            const missing = timeA === null ? a : b;
+            const present = missing === a ? b : a;
+            finding = `${missing.name} was eliminated before ${selected}.`;
+            note = `${present.name} recorded ${present.q[round]} in ${selected}.`;
+        }
+
+        $('qualOverall').textContent = finding;
+        $('qualOverallSub').textContent = `Selected session · ${selected}`;
+        $('qualRoundLabel').textContent = selected;
+        $('qualFinding').textContent = finding;
+        $('qualNameA').textContent = `${a.name} · Driver A`;
+        $('qualNameB').textContent = `${b.name} · Driver B`;
+        $('qualTimeA').textContent = a.q[round] || 'Eliminated';
+        $('qualTimeB').textContent = b.q[round] || 'Eliminated';
+        $('qualProgress').textContent = note;
     }
     // Wire up the controls after the page is ready.
     function attachHandlers() {
@@ -764,6 +694,10 @@
             state.selectedSession = Number(btn.dataset.session);
             renderQualifying();
         }));
+        $('qualSession').addEventListener('change', e => {
+            state.selectedSession = Number(e.target.value);
+            renderQualifying();
+        });
         document.addEventListener('click', e => {
             const btn = e.target.closest('[data-focus]');
             if (btn)
@@ -785,11 +719,6 @@
             }
             renderQualifying();
         });
-        document.querySelectorAll('[data-speed]').forEach(btn => btn.addEventListener('click', () => {
-            state.speedMetric = btn.dataset.speed;
-            document.querySelectorAll('[data-speed]').forEach(item => item.classList.toggle('active', item === btn));
-            drawSpeed();
-        }));
         configureTyres();
         setupMap();
         setupTooltips();
