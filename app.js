@@ -12,6 +12,7 @@
   let playTimer=null, dragStart=null, tooltipAnchor=null;
   const firstName = (d) => d.name.split(' ')[0];
   const fmt = (v) => Number(v).toFixed(3);
+  const fmtShort = (v) => Number(v).toFixed(1);
   function sec(text) { if (!text) return null; const bits=text.split(':'); return Number(bits[0])*60+Number(bits[1]); }
   function timeString(seconds) { const minutes=Math.floor(seconds/60), left=seconds-minutes*60; return `${minutes}:${left.toFixed(3).padStart(6,'0')}`; }
   function driver(code){return BY_CODE[code]}
@@ -116,7 +117,7 @@
     $('focusLap').textContent=`Lap ${state.lap} / ${RACE.totalLaps}`;
     $('mapDriver').textContent=d.name;
     $('focusInsight').textContent= !isActive(d)?`${d.name} is out of the race at this lap.`
-      : `${d.name} is ${p?`P${p}`:'not placed'}${typeof knownGap(d.code)==='number'&&knownGap(d.code)>0?` and ${fmt(knownGap(d.code))}s behind the leader.`:knownGap(d.code)===0?' and leading the race.':'.'}`;
+      : `${d.name} is ${p?`P${p}`:'not placed'}${typeof knownGap(d.code)==='number'&&knownGap(d.code)>0?` and ${fmtShort(knownGap(d.code))}s behind the leader.`:knownGap(d.code)===0?' and leading the race.':'.'}`;
     $('compareToggle').setAttribute('aria-expanded',String(state.showCompare));
     $('compareInline').classList.toggle('hidden',!state.showCompare);
     $('compareInline').setAttribute('aria-hidden',String(!state.showCompare));
@@ -136,8 +137,8 @@
     else {
       const ahead=pa<pb?a:b,behind=pa<pb?b:a;
       if(typeof gapA==='number'&&typeof gapB==='number'){
-        takeaway=`${ahead.name} is ahead of ${behind.name} by ${fmt(Math.abs(gapA-gapB))}s.`;
-      } else takeaway=`${ahead.name} is ahead in P${Math.min(pa,pb)}. ${behind.name} is P${Math.max(pa,pb)}.`;
+        takeaway=`${ahead.name} is ${fmtShort(Math.abs(gapA-gapB))}s ahead.`;
+      } else takeaway=`${ahead.name} is ahead.`;
     }
     $('compareTakeaway').textContent=takeaway;
     const earlier=Object.keys(GAPS).map(Number).filter(l=>l<state.lap).sort((x,y)=>y-x).find(l=>typeof GAPS[l][a.code]==='number' && typeof GAPS[l][b.code]==='number');
@@ -150,27 +151,28 @@
     renderInlineTiming(a,b);
   }
   function renderInlineTiming(a,b){
-    const rows=(kind)=>['Q1','Q2','Q3'].map((round,i)=>{
-      const x=sec(a.q[i]),y=sec(b.q[i]);
-      const outcome=x!==null&&y!==null ? `${(x<y?a:b).code} faster by ${fmt(Math.abs(x-y))}s` :
-        x===null&&y===null ? 'No times recorded for either' : `${x===null?a.code:b.code}: did not qualify for ${round}`;
-      return `<div class="inline-timing-row"><b>${round}</b><span>${a.code} ${a.q[i]||'—'} · ${b.code} ${b.q[i]||'—'}</span><strong>${outcome}</strong></div>`;
-    });
-    $('inlineQualRows').innerHTML=rows().join('');
+    if($('inlineQualRows')) $('inlineQualRows').innerHTML='';
     const sa=SECTORS[a.code],sb=SECTORS[b.code];
     if(sa&&sb){
       $('inlineSectorRows').innerHTML=[0,1,2].map(i=>{
         const quicker=sa[i]<sb[i]?a:b;
-        return `<div class="inline-timing-row"><b>S${i+1}</b><span>${a.code} ${fmt(sa[i])}s · ${b.code} ${fmt(sb[i])}s</span><strong>${quicker.code} faster by ${fmt(Math.abs(sa[i]-sb[i]))}s</strong></div>`;
+        return `<div class="inline-timing-row"><b>S${i+1}</b><span>${a.code} ${fmt(sa[i])}s · ${b.code} ${fmt(sb[i])}s</span><strong>${quicker.name} was ${fmtShort(Math.abs(sa[i]-sb[i]))}s quicker.</strong></div>`;
       }).join('');
-    }else $('inlineSectorRows').innerHTML='<p class="quiet-small">Not available for both selected drivers. No sector times inferred.</p>';
-    const q1a=sec(a.q[0]),q1b=sec(b.q[0]);
-    const q1Line=q1a!==null&&q1b!==null?`In Q1, ${(q1a<q1b?a:b).name} was ${fmt(Math.abs(q1a-q1b))}s quicker.`:'A directly comparable Q1 result is not available.';
-    const sectorLine=sa&&sb?`In each driver’s best recorded race S1, ${(sa[0]<sb[0]?a:b).name} was ${fmt(Math.abs(sa[0]-sb[0]))}s quicker.`:'Best race-sector comparison is not available for this pair.';
-    $('inlineTimingSummary').textContent=`${q1Line} ${sectorLine}`;
+    }else $('inlineSectorRows').innerHTML='<p class="quiet-small">Sector times are not available for both drivers.</p>';
+    const gapA=knownGap(a.code),gapB=knownGap(b.code), pa=position(a.code), pb=position(b.code);
+    let firstLine='';
+    if(typeof gapA==='number'&&typeof gapB==='number'){
+      const ahead = gapA<gapB?a:b;
+      firstLine = `${ahead.name} is ${fmtShort(Math.abs(gapA-gapB))}s ahead.`;
+    } else if(pa && pb){
+      const ahead = pa<pb?a:b;
+      firstLine = `${ahead.name} is ahead.`;
+    }
+    const sectorLine=sa&&sb?`${(sa[0]<sb[0]?a:b).name} was ${fmtShort(Math.abs(sa[0]-sb[0]))}s quicker in best S1.`:'Sector comparison is not available.';
+    $('inlineTimingSummary').textContent=[firstLine, sectorLine].filter(Boolean).join(' ');
   }
   function renderReplay(){
-    for(const id of ['lapNumber','snapshotLap','fieldLap','mapLap'])$(id).textContent=state.lap;
+    for(const id of ['lapNumber','snapshotLap','fieldLap','mapLap'])$(id).textContent=state.lap; if($('quickLapSelect')) $('quickLapSelect').value=String(state.lap);
     const cp=knownCheckpoint(state.lap);
     $('checkpointNote').textContent='';
     renderTyres();renderOrder();moveMarkers();renderFocus();
@@ -323,7 +325,11 @@
     document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>setView(btn.dataset.view)));
     $('playBtn').addEventListener('click',play);$('lapSlider').addEventListener('input',e=>{pause();setLap(Number(e.target.value));});
     $('lapBack').addEventListener('click',()=>{pause();setLap(state.lap-1);});$('lapForward').addEventListener('click',()=>{pause();setLap(state.lap+1);});
-    $('previewBtn').addEventListener('click',()=>{pause();setLap(24);});
+    const quick=$('quickLapSelect');
+    if(quick){
+      quick.innerHTML='<option value="">Jump to lap…</option>' + Array.from({length:RACE.totalLaps},(_,i)=>`<option value="${i+1}">Lap ${i+1}</option>`).join('');
+      quick.addEventListener('change',()=>{ if(quick.value){ pause(); setLap(Number(quick.value)); } });
+    }
     $('driverSelect').addEventListener('change',e=>focus(e.target.value));$('focusSelect').addEventListener('change',e=>focus(e.target.value));
     $('compareBSelect').addEventListener('change',e=>{state.compared=e.target.value;if(state.compared===state.focused){state.compared=state.focused==='HAM'?'LEC':'HAM';$('compareBSelect').value=state.compared;}renderComparison();moveMarkers();});
     $('compareToggle').addEventListener('click',()=>setCompare(!state.showCompare));$('compareClose').addEventListener('click',()=>setCompare(false));
