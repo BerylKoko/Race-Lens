@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090e17">
   <meta name="description" content="A simplified novice-friendly F1 race replay and qualifying prototype.">
   <title>Las Vegas Grand Prix 2025 Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=20261115-layout4">
+  <link rel="stylesheet" href="styles.css?v=20261116-sketchcompare1">
 </head>
 <body>
 <div id="app" class="app">
@@ -94,19 +94,40 @@
             </div>
             <p id="focusInsight" class="insight"></p>
             <div id="compareInline" class="compare-inline hidden" aria-hidden="true">
-              <div class="compare-header"><div><div class="section-eyebrow">COMPARISON / ON THIS LAP</div><h3>See the drivers side by side</h3></div><button class="text-btn" type="button" id="compareClose">Close comparison ×</button></div>
-              <div class="compare-row"><div class="compare-person"><small>DRIVER A · FOCUS</small><strong id="compareAName">Lewis Hamilton</strong><span id="compareADetail"></span></div><span class="vs">VS</span><div class="compare-person"><label for="compareBSelect">DRIVER B</label><select class="select-control" id="compareBSelect" aria-label="Choose a second driver"></select><span id="compareBDetail"></span></div></div>
-              <div id="compareTakeaway" class="compare-takeaway" aria-live="polite"></div>
-              <div class="compare-mini-grid"><div><small>DRIVER A / PITS</small><b id="compareAPits"></b></div><div><small>DRIVER B / PITS</small><b id="compareBPits"></b></div></div>
-              <div class="inline-metrics-intro"><strong>Compare sector times</strong><p>S1, S2 and S3 are parts of a lap.</p></div>
-              <div class="inline-timing-grid"><section class="inline-timing-card" aria-label="Best race sector times">
-                  <h4>Sector times <button class="help" type="button" aria-label="Explain lap sectors" data-tip="S1, S2 and S3 are the three parts of a lap.">?</button></h4>
-                  <div id="inlineSectorRows" class="inline-timing-rows"></div>
-                  <p class="quiet-small">Best sector times.</p>
-                </section>
+              <div class="compare-header">
+                <h3>Driver Comparison</h3>
+                <button class="text-btn" type="button" id="compareClose">Close comparison ×</button>
               </div>
-              <p class="inline-comparison-summary" id="inlineTimingSummary" aria-live="polite"></p>
-              <button type="button" class="outline-btn detailed-link" id="explorePairBtn">Open qualifying comparison →</button>
+              <div class="compare-selectors">
+                <div><label for="compareASelect">Driver one</label><select class="select-control" id="compareASelect" aria-label="Select first driver"></select></div>
+                <span class="vs">VS</span>
+                <div><label for="compareBSelect">Driver two</label><select class="select-control" id="compareBSelect" aria-label="Select second driver"></select></div>
+              </div>
+              <div class="compare-row">
+                <article class="compare-person">
+                  <div class="compare-driver-line"><strong id="compareAName">Lewis Hamilton</strong><b id="compareAPosition">P12</b></div>
+                  <div id="compareATeam" class="compare-team">Ferrari</div>
+                  <div class="compare-stats">
+                    <div><span>Tyre</span><b id="compareATyre">Hard · 2 laps</b></div>
+                    <div><span>Gap to leader</span><b id="compareAGap">+19.0s</b></div>
+                    <div><span>Pit status</span><b id="compareAPits">Not stopped</b></div>
+                  </div>
+                </article>
+                <span class="vs">VS</span>
+                <article class="compare-person">
+                  <div class="compare-driver-line"><strong id="compareBName">Charles Leclerc</strong><b id="compareBPosition">P8</b></div>
+                  <div id="compareBTeam" class="compare-team">Ferrari</div>
+                  <div class="compare-stats">
+                    <div><span>Tyre</span><b id="compareBTyre">Medium · 2 laps</b></div>
+                    <div><span>Gap to leader</span><b id="compareBGap">+13.1s</b></div>
+                    <div><span>Pit status</span><b id="compareBPits">Not stopped</b></div>
+                  </div>
+                </article>
+              </div>
+              <div class="compare-summary">
+                <p id="compareTakeaway" class="compare-takeaway" aria-live="polite"></p>
+                <p id="compareTrend" class="compare-trend" aria-live="polite"></p>
+              </div>
             </div>
           </section>
         </div>
@@ -130,7 +151,7 @@
   </main>
   <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
 </div>
-<script src="data.js?v=20261115-layout4"></script>
-<script src="app.js?v=20261115-layout4"></script>
+<script src="data.js?v=20261116-sketchcompare1"></script>
+<script src="app.js?v=20261116-sketchcompare1"></script>
 </body>
 </html>
