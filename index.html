@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#090e17">
     <meta name="description" content="A simplified novice-friendly F1 race replay and qualifying prototype.">
     <title>Las Vegas Grand Prix 2025 Prototype</title>
-    <link rel="stylesheet" href="styles.css?v=20261116-readable1">
+    <link rel="stylesheet" href="styles.css?v=20261116-qualifying2">
   </head>
   <body>
     <div id="app" class="app">
@@ -241,95 +241,92 @@
             </div>
           </div>
         </section>
-        <!-- Qualifying times and pace charts -->
-        <section id="qualifyingView" class="view" aria-label="Qualifying and pace comparisons" hidden>
-          <div class="subpage-hero">
-            <div>
-              <h2>Qualifying</h2>
-              <p>Compare two drivers in Q1, Q2 and Q3.</p>
+        <!-- Qualifying: compare two drivers across Q1, Q2 and Q3 -->
+        <section id="qualifyingView" class="view qualifying-page" aria-label="Qualifying comparison" hidden>
+          <div class="qual-introduction">
+            <h2>Qualifying</h2>
+            <p>Before the Grand Prix, drivers set fast laps to decide where they start the race. The slowest five are eliminated in Q1, another five in Q2, and the fastest ten compete in Q3 for pole position (first on the grid).</p>
+            <div class="qual-round-guide" aria-label="How the three qualifying rounds work">
+              <div><strong>Q1</strong><span>20 drivers start</span></div>
+              <div><strong>Q2</strong><span>15 drivers remain</span></div>
+              <div><strong>Q3</strong><span>Top 10 fight for pole</span></div>
             </div>
           </div>
-          <p class="note-inline"><strong>Q1, Q2 and Q3</strong> are qualifying sessions. <strong>S1, S2 and S3</strong> are parts of a lap.</p>
-          <div class="qual-controls">
-            <button type="button" class="outline-btn" id="backToFocus">← Back to race view</button>
-            <div>
-              <label for="qualA">Driver A</label>
-              <select id="qualA" class="select-control"></select>
-            </div><span>VS</span>
-            <div>
-              <label for="qualB">Driver B</label>
-              <select id="qualB" class="select-control"></select>
+
+          <div class="qual-workspace">
+            <!-- Same control order as the original sketch. -->
+            <div class="qual-selectors">
+              <div class="qual-field">
+                <span class="qual-label">Grand Prix</span>
+                <div class="qual-fixed-value">Las Vegas · 2025</div>
+              </div>
+              <div class="qual-field">
+                <label class="qual-label" for="qualSession">Session</label>
+                <select id="qualSession" class="select-control" aria-label="Choose qualifying round">
+                  <option value="0">Q1</option>
+                  <option value="1">Q2</option>
+                  <option value="2">Q3</option>
+                </select>
+              </div>
+              <div class="qual-field">
+                <label class="qual-label" for="qualA">Driver A</label>
+                <select id="qualA" class="select-control"></select>
+              </div>
+              <div class="qual-field">
+                <label class="qual-label" for="qualB">Driver B</label>
+                <select id="qualB" class="select-control"></select>
+              </div>
             </div>
+
+            <h3 class="qual-block-title">At a glance</h3>
+            <div class="qual-at-glance" aria-label="Qualifying comparison summary">
+              <div class="qual-glance-summary">
+                <span class="qual-card-label">Driver A vs Driver B</span>
+                <strong id="qualOverall">Choose two drivers</strong>
+                <span id="qualOverallSub">Selected session: Q1</span>
+              </div>
+              <button type="button" class="qual-round-card active" data-session="0" aria-pressed="true">
+                <span class="qual-card-label">Q1</span>
+                <strong id="qualQ1Headline">Compare Q1</strong>
+                <span id="qualQ1Times"></span>
+              </button>
+              <button type="button" class="qual-round-card" data-session="1" aria-pressed="false">
+                <span class="qual-card-label">Q2</span>
+                <strong id="qualQ2Headline">Compare Q2</strong>
+                <span id="qualQ2Times"></span>
+              </button>
+              <button type="button" class="qual-round-card" data-session="2" aria-pressed="false">
+                <span class="qual-card-label">Q3</span>
+                <strong id="qualQ3Headline">Compare Q3</strong>
+                <span id="qualQ3Times"></span>
+              </button>
+            </div>
+
+            <!-- Chart on the left, plain-language finding on the right. -->
+            <div class="qual-lower-grid">
+              <section class="qual-graph-card" aria-labelledby="qualGraphTitle">
+                <h3 id="qualGraphTitle">Q1 / Q2 / Q3 times</h3>
+                <p>Each driver's fastest lap in each round. A lower time is faster.</p>
+                <div class="line-legend" id="qualLegend"></div>
+                <svg id="qualChart" class="chart-svg" viewBox="0 0 650 320" role="img" aria-label="Q1, Q2 and Q3 qualifying times for two drivers"></svg>
+              </section>
+              <section class="qual-finding-card" aria-labelledby="qualFindingTitle">
+                <h3 id="qualFindingTitle">What happened?</h3>
+                <p class="qual-round-label" id="qualRoundLabel">Q1</p>
+                <p class="qual-main-finding" id="qualFinding" aria-live="polite"></p>
+                <div class="qual-time-pair">
+                  <div><span id="qualNameA">Driver A</span><strong id="qualTimeA">—</strong></div>
+                  <div><span id="qualNameB">Driver B</span><strong id="qualTimeB">—</strong></div>
+                </div>
+                <p class="qual-next-step" id="qualProgress"></p>
+              </section>
+            </div>
+            <button type="button" class="text-btn qual-return" id="backToFocus">← Back to race replay</button>
           </div>
-          <div class="qual-session-picker" role="group" aria-label="Highlight one qualifying round"><span>Round:</span>
-            <button type="button" class="session-pick active" data-session="0" aria-pressed="true">Q1</button>
-            <button type="button" class="session-pick" data-session="1" aria-pressed="false">Q2</button>
-            <button type="button" class="session-pick" data-session="2" aria-pressed="false">Q3</button>
-          </div>
-          <div id="selectedSessionResult" class="selected-session-result" aria-live="polite"></div>
-          <div id="qualTakeaway" class="headline-result" aria-live="polite"></div>
-          <div class="analytics-grid">
-            <article class="chart-card">
-              <div class="row spread">
-                <div>
-                  <div class="section-eyebrow">01 / QUALIFYING TIMES</div>
-                  <h3>Fastest lap by session 
-                    <button type="button" class="help" aria-label="Explain qualifying chart" data-tip="Lower times are faster. Compare drivers in the same round.">?</button>
-                  </h3>
-                </div><span class="chart-unit">SECONDS · LOWER IS FASTER</span>
-              </div>
-              <div class="line-legend" id="qualLegend"></div>
-              <svg id="qualChart" class="chart-svg" viewBox="0 0 650 320" role="img" aria-label="Qualifying time line chart for two selected drivers"></svg>
-              <div id="sessionDetails" class="session-details"></div>
-              <p class="quiet-small">A driver who is knocked out has no later qualifying time.</p>
-            </article>
-            <article class="chart-card">
-              <div class="section-eyebrow">02 / SESSION-BY-SESSION</div>
-              <h3>Who had the edge?</h3>
-              <div id="qualDifferences" class="session-rows"></div>
-              <div class="lesson-card"><strong>How does qualifying affect the race?</strong>
-                <p id="qualExplainer"></p>
-              </div>
-            </article>
-          </div>
-          <div class="analytics-grid analytics-bottom">
-            <article class="chart-card">
-              <div class="row spread">
-                <div>
-                  <div class="section-eyebrow">03 / SECTOR TIMES</div>
-                  <h3>Where is time gained? 
-                    <button class="help" type="button" aria-label="Explain lap sectors" data-tip="Each lap has three sectors: S1, S2 and S3.">?</button>
-                  </h3>
-                </div><span class="chart-unit">RACE BEST SECTORS · SECONDS</span>
-              </div>
-              <div class="sector-bars" id="sectorBars"></div>
-              <div id="sectorTakeaway" class="sector-takeaway"></div>
-            </article>
-            <article class="chart-card">
-              <div class="row spread">
-                <div>
-                  <div class="section-eyebrow">04 / SIMPLE SPEED GRAPH</div>
-                  <h3>Understanding a speed trace 
-                    <button type="button" class="help" aria-label="Explain speed graph" data-tip="A speed graph shows how a car speeds up on straights and slows down for turns.">?</button>
-                  </h3>
-                </div><span class="chart-unit">TEACHING DEMO</span>
-              </div>
-              <svg id="speedChart" viewBox="0 0 650 290" class="chart-svg" role="img" aria-label="Illustrative comparison of speed through a lap"></svg>
-              <div class="speed-switches">
-                <button class="metric-switch active" data-speed="speed" type="button">Speed</button>
-                <button class="metric-switch" data-speed="brake" type="button">Brake ?</button>
-                <button class="metric-switch" data-speed="throttle" type="button">Throttle ?</button>
-              </div>
-              <p class="quiet-small">Example speed graph.</p>
-            </article>
-          </div>
-          <footer class="section-footer"><span>Exact qualifying times + reference best sectors; speed trace schematic.</span>
-            <button class="text-btn" data-view="race">← Back to race replay</button>
-          </footer>
         </section>
       </main>
       <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
-    </div><script src="data.js?v=20261116-readable1"></script>
-<script src="app.js?v=20261116-readable1"></script>
+    </div><script src="data.js?v=20261116-qualifying2"></script>
+<script src="app.js?v=20261116-qualifying2"></script>
   </body>
 </html>
