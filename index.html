@@ -1,157 +1,335 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#090e17">
-  <meta name="description" content="A simplified novice-friendly F1 race replay and qualifying prototype.">
-  <title>Las Vegas Grand Prix 2025 Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=20261116-sketchcompare1">
-</head>
-<body>
-<div id="app" class="app">
-  <header class="site-header simple-header">
-    <div><h1>F1 Interface Prototype</h1></div>
-  </header>
-
-  <nav class="top-tabs" aria-label="Primary views">
-    <button type="button" class="tab active" data-view="race" aria-current="page">Race replay</button>
-    <button type="button" class="tab" data-view="qualifying">Qualifying</button>
-  </nav>
-
-  <main>
-    <section id="raceView" class="view active" aria-label="Historical race replay">
-      <div class="toolbar">
-        <div class="toolbar-topline"><p class="race-context">2025 Las Vegas Grand Prix</p></div>
-        <div class="timeline-controls"><button id="playBtn" class="primary-btn" type="button" aria-label="Play lap replay"><span id="playIcon">▶</span><span id="playText">Play replay</span></button>
-          <div class="lap-indicator">LAP <b id="lapNumber">2</b><span>/ 50</span></div>
-          <button id="lapBack" class="icon-btn" type="button" aria-label="Go back one lap">‹</button>
-          <input type="range" id="lapSlider" min="1" max="50" value="2" aria-label="Selected lap, from 1 to 50">
-          <button id="lapForward" class="icon-btn" type="button" aria-label="Go forward one lap">›</button>
-          <div class="lap-jump"><label for="quickLapSelect">Jump to lap</label><select id="quickLapSelect" class="select-control compact" aria-label="Jump to a lap"><option value="">Choose a lap</option><option value="1">Lap 1</option><option value="2">Lap 2</option><option value="3">Lap 3</option><option value="4">Lap 4</option><option value="5">Lap 5</option><option value="6">Lap 6</option><option value="7">Lap 7</option><option value="8">Lap 8</option><option value="9">Lap 9</option><option value="10">Lap 10</option><option value="11">Lap 11</option><option value="12">Lap 12</option><option value="13">Lap 13</option><option value="14">Lap 14</option><option value="15">Lap 15</option><option value="16">Lap 16</option><option value="17">Lap 17</option><option value="18">Lap 18</option><option value="19">Lap 19</option><option value="20">Lap 20</option><option value="21">Lap 21</option><option value="22">Lap 22</option><option value="23">Lap 23</option><option value="24">Lap 24</option><option value="25">Lap 25</option><option value="26">Lap 26</option><option value="27">Lap 27</option><option value="28">Lap 28</option><option value="29">Lap 29</option><option value="30">Lap 30</option><option value="31">Lap 31</option><option value="32">Lap 32</option><option value="33">Lap 33</option><option value="34">Lap 34</option><option value="35">Lap 35</option><option value="36">Lap 36</option><option value="37">Lap 37</option><option value="38">Lap 38</option><option value="39">Lap 39</option><option value="40">Lap 40</option><option value="41">Lap 41</option><option value="42">Lap 42</option><option value="43">Lap 43</option><option value="44">Lap 44</option><option value="45">Lap 45</option><option value="46">Lap 46</option><option value="47">Lap 47</option><option value="48">Lap 48</option><option value="49">Lap 49</option><option value="50">Lap 50</option></select></div>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#090e17">
+    <meta name="description" content="A simplified novice-friendly F1 race replay and qualifying prototype.">
+    <title>Las Vegas Grand Prix 2025 Prototype</title>
+    <link rel="stylesheet" href="styles.css?v=20261116-readable1">
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="site-header simple-header">
+        <div>
+          <h1>F1 Interface Prototype</h1>
         </div>
-      </div>
-
-      <div class="replay-grid">
-        <aside class="snapshot-panel">
-          <h2>Lap <span id="snapshotLap">2</span></h2>
-          <p class="muted" id="fieldCount">20 entered · 19 running at lap 2</p>
-          <div class="section-divider"></div>
-          <div class="row spread gap-sm"><h3>Tyres on the field</h3></div>
-          <div class="tyre-summary" id="tyreSummary"><div class="tyre-line"><span><i class="tyre-dot soft"></i>Soft</span><b>0</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:0%;background:#f36b8f"></span></div><div class="tyre-line"><span><i class="tyre-dot medium"></i>Medium</span><b>10</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:53%;background:#f5d275"></span></div><div class="tyre-line"><span><i class="tyre-dot hard"></i>Hard</span><b>8</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:42%;background:#ecf3f9"></span></div></div>
-          <h3 class="filter-title">Show drivers on…</h3>
-          <div class="filter-checks" id="tyreFilters" role="group" aria-label="Filter drivers by tyre compound">
-            <div class="tyre-filter-row"><label for="tyreSoft"><input id="tyreSoft" type="checkbox" name="tyre" value="Soft"><span class="tyre-dot soft"></span><span>Soft</span></label><button class="help inline-help" type="button" aria-label="What is a soft tyre?" data-tip="Soft: the quickest tyres. They wear out faster.">?</button></div>
-            <div class="tyre-filter-row"><label for="tyreMedium"><input id="tyreMedium" type="checkbox" name="tyre" value="Medium"><span class="tyre-dot medium"></span><span>Medium</span></label><button class="help inline-help" type="button" aria-label="What is a medium tyre?" data-tip="Medium: a balance of speed and tyre life.">?</button></div>
-            <div class="tyre-filter-row"><label for="tyreHard"><input id="tyreHard" type="checkbox" name="tyre" value="Hard"><span class="tyre-dot hard"></span><span>Hard</span></label><button class="help inline-help" type="button" aria-label="What is a hard tyre?" data-tip="Hard: slower tyres that last longer.">?</button></div>
+      </header>
+      <nav class="top-tabs" aria-label="Primary views">
+        <button type="button" class="tab active" data-view="race" aria-current="page">Race replay</button>
+        <button type="button" class="tab" data-view="qualifying">Qualifying</button>
+      </nav>
+      <!-- Race replay and driver comparison -->
+      <main>
+        <section id="raceView" class="view active" aria-label="Historical race replay">
+          <div class="toolbar">
+            <div class="toolbar-topline">
+              <p class="race-context">2025 Las Vegas Grand Prix</p>
+            </div>
+            <div class="timeline-controls">
+              <button id="playBtn" class="primary-btn" type="button" aria-label="Play lap replay"><span id="playIcon">▶</span><span id="playText">Play replay</span></button>
+              <div class="lap-indicator">LAP <b id="lapNumber">2</b><span>/ 50</span></div>
+              <button id="lapBack" class="icon-btn" type="button" aria-label="Go back one lap">‹</button>
+              <input type="range" id="lapSlider" min="1" max="50" value="2" aria-label="Selected lap, from 1 to 50">
+              <button id="lapForward" class="icon-btn" type="button" aria-label="Go forward one lap">›</button>
+              <div class="lap-jump">
+                <label for="quickLapSelect">Jump to lap</label>
+                <select id="quickLapSelect" class="select-control compact" aria-label="Jump to a lap">
+                  <option value="">Choose a lap</option>
+                  <option value="1">Lap 1</option>
+                  <option value="2">Lap 2</option>
+                  <option value="3">Lap 3</option>
+                  <option value="4">Lap 4</option>
+                  <option value="5">Lap 5</option>
+                  <option value="6">Lap 6</option>
+                  <option value="7">Lap 7</option>
+                  <option value="8">Lap 8</option>
+                  <option value="9">Lap 9</option>
+                  <option value="10">Lap 10</option>
+                  <option value="11">Lap 11</option>
+                  <option value="12">Lap 12</option>
+                  <option value="13">Lap 13</option>
+                  <option value="14">Lap 14</option>
+                  <option value="15">Lap 15</option>
+                  <option value="16">Lap 16</option>
+                  <option value="17">Lap 17</option>
+                  <option value="18">Lap 18</option>
+                  <option value="19">Lap 19</option>
+                  <option value="20">Lap 20</option>
+                  <option value="21">Lap 21</option>
+                  <option value="22">Lap 22</option>
+                  <option value="23">Lap 23</option>
+                  <option value="24">Lap 24</option>
+                  <option value="25">Lap 25</option>
+                  <option value="26">Lap 26</option>
+                  <option value="27">Lap 27</option>
+                  <option value="28">Lap 28</option>
+                  <option value="29">Lap 29</option>
+                  <option value="30">Lap 30</option>
+                  <option value="31">Lap 31</option>
+                  <option value="32">Lap 32</option>
+                  <option value="33">Lap 33</option>
+                  <option value="34">Lap 34</option>
+                  <option value="35">Lap 35</option>
+                  <option value="36">Lap 36</option>
+                  <option value="37">Lap 37</option>
+                  <option value="38">Lap 38</option>
+                  <option value="39">Lap 39</option>
+                  <option value="40">Lap 40</option>
+                  <option value="41">Lap 41</option>
+                  <option value="42">Lap 42</option>
+                  <option value="43">Lap 43</option>
+                  <option value="44">Lap 44</option>
+                  <option value="45">Lap 45</option>
+                  <option value="46">Lap 46</option>
+                  <option value="47">Lap 47</option>
+                  <option value="48">Lap 48</option>
+                  <option value="49">Lap 49</option>
+                  <option value="50">Lap 50</option></select>
+              </div>
+            </div>
           </div>
-          <div class="filter-results" id="filterResults" aria-live="polite"></div>
-          <div class="section-divider"></div>
-          <div class="row spread gap-sm"><h3>Pit-stop progress <button type="button" class="help inline-help" aria-label="What is a pit stop?" data-tip="Pit stop: the driver stops to change worn tyres.">?</button></h3></div>
-          <div class="pit-metric"><strong id="stoppedCount">0</strong><span>drivers have made at least one pit stop</span></div>
-        </aside>
-
-        <div class="main-column">
-          <section class="map-panel">
-            <div class="panel-heading"><div><h2>Track view <span class="muted-in-heading">Lap <span id="fieldLap">2</span></span></h2></div></div>
-            <p id="checkpointNote" class="checkpoint-note" aria-live="polite"></p>
-            <div class="map-layout">
-              <div class="map-column">
-                <div id="trackViewport" class="track-viewport" aria-label="Schematic draggable and zoomable circuit map. Driver labels are clickable. Drag empty area to pan.">
-                  <div id="trackCanvas" class="track-canvas">
-                    <svg id="trackSvg" viewBox="0 0 1000 620" aria-label="Illustrative Las Vegas-style track outline" role="img">
-                      <defs><filter id="mapGlow"><feGaussianBlur stdDeviation="13" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-                      <path class="track-glow" d="M 174 520 C 115 493 92 441 108 386 L 168 170 C 181 122 223 91 278 86 L 704 86 C 775 86 821 105 849 147 C 872 180 884 226 876 276 L 842 472 C 834 519 805 547 756 549 L 585 549 C 540 548 516 530 501 498 L 452 393 C 439 364 414 350 383 353 L 294 362 C 258 366 236 390 235 425 L 235 467 C 234 505 212 531 174 520 Z"/>
-                      <path id="trackPath" class="track-path" d="M 174 520 C 115 493 92 441 108 386 L 168 170 C 181 122 223 91 278 86 L 704 86 C 775 86 821 105 849 147 C 872 180 884 226 876 276 L 842 472 C 834 519 805 547 756 549 L 585 549 C 540 548 516 530 501 498 L 452 393 C 439 364 414 350 383 353 L 294 362 C 258 366 236 390 235 425 L 235 467 C 234 505 212 531 174 520 Z" />
-                    </svg>
-                    <div id="markerLayer" class="marker-layer"></div>
-                    <div class="map-center" aria-hidden="true"><strong>Lap <b id="mapLap">2</b></strong><small id="mapDriver">Lewis Hamilton</small></div>
+          <div class="replay-grid">
+            <aside class="snapshot-panel">
+              <h2>Lap <span id="snapshotLap">2</span></h2>
+              <p class="muted" id="fieldCount">20 entered · 19 running at lap 2</p>
+              <div class="section-divider"></div>
+              <div class="row spread gap-sm">
+                <h3>Tyres on the field</h3>
+              </div>
+              <div class="tyre-summary" id="tyreSummary">
+                <div class="tyre-line"><span><i class="tyre-dot soft"></i>Soft</span><b>0</b></div>
+                <div class="tyre-bar"><span class="tyre-bar-fill" style="width:0%;background:#f36b8f"></span></div>
+                <div class="tyre-line"><span><i class="tyre-dot medium"></i>Medium</span><b>10</b></div>
+                <div class="tyre-bar"><span class="tyre-bar-fill" style="width:53%;background:#f5d275"></span></div>
+                <div class="tyre-line"><span><i class="tyre-dot hard"></i>Hard</span><b>8</b></div>
+                <div class="tyre-bar"><span class="tyre-bar-fill" style="width:42%;background:#ecf3f9"></span></div>
+              </div>
+              <h3 class="filter-title">Show drivers on…</h3>
+              <div class="filter-checks" id="tyreFilters" role="group" aria-label="Filter drivers by tyre compound">
+                <div class="tyre-filter-row">
+                  <label for="tyreSoft"><input id="tyreSoft" type="checkbox" name="tyre" value="Soft"><span class="tyre-dot soft"></span><span>Soft</span></label>
+                  <button class="help inline-help" type="button" aria-label="What is a soft tyre?" data-tip="Soft: the quickest tyres. They wear out faster.">?</button>
+                </div>
+                <div class="tyre-filter-row">
+                  <label for="tyreMedium"><input id="tyreMedium" type="checkbox" name="tyre" value="Medium"><span class="tyre-dot medium"></span><span>Medium</span></label>
+                  <button class="help inline-help" type="button" aria-label="What is a medium tyre?" data-tip="Medium: a balance of speed and tyre life.">?</button>
+                </div>
+                <div class="tyre-filter-row">
+                  <label for="tyreHard"><input id="tyreHard" type="checkbox" name="tyre" value="Hard"><span class="tyre-dot hard"></span><span>Hard</span></label>
+                  <button class="help inline-help" type="button" aria-label="What is a hard tyre?" data-tip="Hard: slower tyres that last longer.">?</button>
+                </div>
+              </div>
+              <div class="filter-results" id="filterResults" aria-live="polite"></div>
+              <div class="section-divider"></div>
+              <div class="row spread gap-sm">
+                <h3>Pit-stop progress 
+                  <button type="button" class="help inline-help" aria-label="What is a pit stop?" data-tip="Pit stop: the driver stops to change worn tyres.">?</button>
+                </h3>
+              </div>
+              <div class="pit-metric"><strong id="stoppedCount">0</strong><span>drivers have made at least one pit stop</span></div>
+            </aside>
+            <div class="main-column">
+              <section class="map-panel">
+                <div class="panel-heading">
+                  <div>
+                    <h2>Track view <span class="muted-in-heading">Lap <span id="fieldLap">2</span></span></h2>
                   </div>
                 </div>
-                <div class="map-controls"><div><button id="zoomOut" class="icon-btn" aria-label="Zoom map out" type="button">−</button><button id="zoomIn" class="icon-btn" aria-label="Zoom map in" type="button">+</button><button id="resetMap" class="outline-btn tiny" type="button">Reset map</button></div></div>
-              </div>
-              <aside class="running-panel"><label class="select-label" for="driverSelect">Select a driver</label><select id="driverSelect" class="select-control" aria-label="Choose focused driver"></select><div class="running-heading"><h3>Running order</h3></div><div id="runningOrder" class="running-list" aria-live="polite"></div></aside>
-            </div>
-          </section>
-
-          <section class="focus-panel" id="driverFocus">
-            <div class="focus-top">
-              <div class="focus-heading-group">
-                <div class="focus-heading-line">
-                  <h2 class="focus-section-title">Driver Focus</h2>
-                  <label class="visually-hidden" for="focusSelect">Change focused driver</label>
-                  <select id="focusSelect" class="select-control focus-header-picker" aria-label="Select driver beside Driver Focus heading"></select>
+                <p id="checkpointNote" class="checkpoint-note" aria-live="polite"></p>
+                <div class="map-layout">
+                  <div class="map-column">
+                    <div id="trackViewport" class="track-viewport" aria-label="Schematic draggable and zoomable circuit map. Driver labels are clickable. Drag empty area to pan.">
+                      <div id="trackCanvas" class="track-canvas">
+                        <svg id="trackSvg" viewBox="0 0 1000 620" aria-label="Illustrative Las Vegas-style track outline" role="img">
+                          <defs>
+                            <filter id="mapGlow"><feGaussianBlur stdDeviation="13" result="blur"/>
+                              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                          </defs><path class="track-glow" d="M 174 520 C 115 493 92 441 108 386 L 168 170 C 181 122 223 91 278 86 L 704 86 C 775 86 821 105 849 147 C 872 180 884 226 876 276 L 842 472 C 834 519 805 547 756 549 L 585 549 C 540 548 516 530 501 498 L 452 393 C 439 364 414 350 383 353 L 294 362 C 258 366 236 390 235 425 L 235 467 C 234 505 212 531 174 520 Z"/>
+<path id="trackPath" class="track-path" d="M 174 520 C 115 493 92 441 108 386 L 168 170 C 181 122 223 91 278 86 L 704 86 C 775 86 821 105 849 147 C 872 180 884 226 876 276 L 842 472 C 834 519 805 547 756 549 L 585 549 C 540 548 516 530 501 498 L 452 393 C 439 364 414 350 383 353 L 294 362 C 258 366 236 390 235 425 L 235 467 C 234 505 212 531 174 520 Z" />
+                        </svg>
+                        <div id="markerLayer" class="marker-layer"></div>
+                        <div class="map-center" aria-hidden="true"><strong>Lap <b id="mapLap">2</b></strong><small id="mapDriver">Lewis Hamilton</small></div>
+                      </div>
+                    </div>
+                    <div class="map-controls">
+                      <div>
+                        <button id="zoomOut" class="icon-btn" aria-label="Zoom map out" type="button">−</button>
+                        <button id="zoomIn" class="icon-btn" aria-label="Zoom map in" type="button">+</button>
+                        <button id="resetMap" class="outline-btn tiny" type="button">Reset map</button>
+                      </div>
+                    </div>
+                  </div>
+                  <aside class="running-panel">
+                    <label class="select-label" for="driverSelect">Select a driver</label>
+                    <select id="driverSelect" class="select-control" aria-label="Choose focused driver"></select>
+                    <div class="running-heading">
+                      <h3>Running order</h3>
+                    </div>
+                    <div id="runningOrder" class="running-list" aria-live="polite"></div>
+                  </aside>
                 </div>
-                <div class="focus-identity"><div class="focus-title-row"><h3 id="focusName">Lewis Hamilton</h3><span id="focusPosition" class="position-pill">P12</span></div><p id="focusTeam" class="muted">Ferrari</p></div>
-              </div>
-              <div class="focus-actions"><button id="compareToggle" type="button" class="primary-btn secondary-action" aria-expanded="false" aria-controls="compareInline">+ Compare</button></div>
-            </div>
-            <div class="stat-grid">
-              <div class="stat"><span>Current tyre <button class="help inline-help" type="button" aria-label="Explain tyre age" data-tip="Tyre age: how many laps these tyres have been used.">?</button></span><strong id="focusTyre">Hard · 2 laps</strong></div>
-              <div class="stat"><span>Gap to leader <button class="help inline-help" type="button" aria-label="Explain gap to leader" data-tip="Gap to leader: how many seconds behind first place.">?</button></span><strong id="focusGap">+19.016s</strong></div>
-              <div class="stat"><span>Pit status <button class="help inline-help" type="button" aria-label="Explain pit status" data-tip="Pit stop: the driver stops to change worn tyres.">?</button></span><strong id="focusPit">Not stopped</strong></div>
-              <div class="stat"><span>Race lap</span><strong id="focusLap">Lap 2 of 50</strong></div>
-            </div>
-            <p id="focusInsight" class="insight"></p>
-            <div id="compareInline" class="compare-inline hidden" aria-hidden="true">
-              <div class="compare-header">
-                <h3>Driver Comparison</h3>
-                <button class="text-btn" type="button" id="compareClose">Close comparison ×</button>
-              </div>
-              <div class="compare-selectors">
-                <div><label for="compareASelect">Driver one</label><select class="select-control" id="compareASelect" aria-label="Select first driver"></select></div>
-                <span class="vs">VS</span>
-                <div><label for="compareBSelect">Driver two</label><select class="select-control" id="compareBSelect" aria-label="Select second driver"></select></div>
-              </div>
-              <div class="compare-row">
-                <article class="compare-person">
-                  <div class="compare-driver-line"><strong id="compareAName">Lewis Hamilton</strong><b id="compareAPosition">P12</b></div>
-                  <div id="compareATeam" class="compare-team">Ferrari</div>
-                  <div class="compare-stats">
-                    <div><span>Tyre</span><b id="compareATyre">Hard · 2 laps</b></div>
-                    <div><span>Gap to leader</span><b id="compareAGap">+19.0s</b></div>
-                    <div><span>Pit status</span><b id="compareAPits">Not stopped</b></div>
+              </section>
+              <section class="focus-panel" id="driverFocus">
+                <div class="focus-top">
+                  <div class="focus-heading-group">
+                    <div class="focus-heading-line">
+                      <h2 class="focus-section-title">Driver Focus</h2>
+                      <label class="visually-hidden" for="focusSelect">Change focused driver</label>
+                      <select id="focusSelect" class="select-control focus-header-picker" aria-label="Select driver beside Driver Focus heading"></select>
+                    </div>
+                    <div class="focus-identity">
+                      <div class="focus-title-row">
+                        <h3 id="focusName">Lewis Hamilton</h3><span id="focusPosition" class="position-pill">P12</span>
+                      </div>
+                      <p id="focusTeam" class="muted">Ferrari</p>
+                    </div>
                   </div>
-                </article>
-                <span class="vs">VS</span>
-                <article class="compare-person">
-                  <div class="compare-driver-line"><strong id="compareBName">Charles Leclerc</strong><b id="compareBPosition">P8</b></div>
-                  <div id="compareBTeam" class="compare-team">Ferrari</div>
-                  <div class="compare-stats">
-                    <div><span>Tyre</span><b id="compareBTyre">Medium · 2 laps</b></div>
-                    <div><span>Gap to leader</span><b id="compareBGap">+13.1s</b></div>
-                    <div><span>Pit status</span><b id="compareBPits">Not stopped</b></div>
+                  <div class="focus-actions">
+                    <button id="compareToggle" type="button" class="primary-btn secondary-action" aria-expanded="false" aria-controls="compareInline">+ Compare</button>
                   </div>
-                </article>
-              </div>
-              <div class="compare-summary">
-                <p id="compareTakeaway" class="compare-takeaway" aria-live="polite"></p>
-                <p id="compareTrend" class="compare-trend" aria-live="polite"></p>
-              </div>
+                </div>
+                <div class="stat-grid">
+                  <div class="stat"><span>Current tyre <button class="help inline-help" type="button" aria-label="Explain tyre age" data-tip="Tyre age: how many laps these tyres have been used.">?</button></span><strong id="focusTyre">Hard · 2 laps</strong></div>
+                  <div class="stat"><span>Gap to leader <button class="help inline-help" type="button" aria-label="Explain gap to leader" data-tip="Gap to leader: how many seconds behind first place.">?</button></span><strong id="focusGap">+19.016s</strong></div>
+                  <div class="stat"><span>Pit status <button class="help inline-help" type="button" aria-label="Explain pit status" data-tip="Pit stop: the driver stops to change worn tyres.">?</button></span><strong id="focusPit">Not stopped</strong></div>
+                  <div class="stat"><span>Race lap</span><strong id="focusLap">Lap 2 of 50</strong></div>
+                </div>
+                <p id="focusInsight" class="insight"></p>
+                <div id="compareInline" class="compare-inline hidden" aria-hidden="true">
+                  <div class="compare-header">
+                    <h3>Driver Comparison</h3>
+                    <button class="text-btn" type="button" id="compareClose">Close comparison ×</button>
+                  </div>
+                  <div class="compare-selectors">
+                    <div>
+                      <label for="compareASelect">Driver one</label>
+                      <select class="select-control" id="compareASelect" aria-label="Select first driver"></select>
+                    </div><span class="vs">VS</span>
+                    <div>
+                      <label for="compareBSelect">Driver two</label>
+                      <select class="select-control" id="compareBSelect" aria-label="Select second driver"></select>
+                    </div>
+                  </div>
+                  <div class="compare-row">
+                    <article class="compare-person">
+                      <div class="compare-driver-line"><strong id="compareAName">Lewis Hamilton</strong><b id="compareAPosition">P12</b></div>
+                      <div id="compareATeam" class="compare-team">Ferrari</div>
+                      <div class="compare-stats">
+                        <div><span>Tyre</span><b id="compareATyre">Hard · 2 laps</b></div>
+                        <div><span>Gap to leader</span><b id="compareAGap">+19.0s</b></div>
+                        <div><span>Pit status</span><b id="compareAPits">Not stopped</b></div>
+                      </div>
+                    </article><span class="vs">VS</span>
+                    <article class="compare-person">
+                      <div class="compare-driver-line"><strong id="compareBName">Charles Leclerc</strong><b id="compareBPosition">P8</b></div>
+                      <div id="compareBTeam" class="compare-team">Ferrari</div>
+                      <div class="compare-stats">
+                        <div><span>Tyre</span><b id="compareBTyre">Medium · 2 laps</b></div>
+                        <div><span>Gap to leader</span><b id="compareBGap">+13.1s</b></div>
+                        <div><span>Pit status</span><b id="compareBPits">Not stopped</b></div>
+                      </div>
+                    </article>
+                  </div>
+                  <div class="compare-summary">
+                    <p id="compareTakeaway" class="compare-takeaway" aria-live="polite"></p>
+                    <p id="compareTrend" class="compare-trend" aria-live="polite"></p>
+                  </div>
+                </div>
+              </section>
             </div>
-          </section>
-        </div>
-      </div>
-    </section>
-
-    <section id="qualifyingView" class="view" aria-label="Qualifying and pace comparisons" hidden>
-      <div class="subpage-hero"><div><h2>Qualifying</h2><p>Compare two drivers in Q1, Q2 and Q3.</p></div></div>
-      <p class="note-inline"><strong>Q1, Q2 and Q3</strong> are qualifying sessions. <strong>S1, S2 and S3</strong> are parts of a lap.</p>
-      <div class="qual-controls"><button type="button" class="outline-btn" id="backToFocus">← Back to race view</button><div><label for="qualA">Driver A</label><select id="qualA" class="select-control"></select></div><span>VS</span><div><label for="qualB">Driver B</label><select id="qualB" class="select-control"></select></div></div>
-      <div class="qual-session-picker" role="group" aria-label="Highlight one qualifying round"><span>Round:</span><button type="button" class="session-pick active" data-session="0" aria-pressed="true">Q1</button><button type="button" class="session-pick" data-session="1" aria-pressed="false">Q2</button><button type="button" class="session-pick" data-session="2" aria-pressed="false">Q3</button></div>
-      <div id="selectedSessionResult" class="selected-session-result" aria-live="polite"></div>
-      <div id="qualTakeaway" class="headline-result" aria-live="polite"></div>
-      <div class="analytics-grid"><article class="chart-card"><div class="row spread"><div><div class="section-eyebrow">01 / QUALIFYING TIMES</div><h3>Fastest lap by session <button type="button" class="help" aria-label="Explain qualifying chart" data-tip="Lower times are faster. Compare drivers in the same round.">?</button></h3></div><span class="chart-unit">SECONDS · LOWER IS FASTER</span></div><div class="line-legend" id="qualLegend"></div><svg id="qualChart" class="chart-svg" viewBox="0 0 650 320" role="img" aria-label="Qualifying time line chart for two selected drivers"></svg><div id="sessionDetails" class="session-details"></div><p class="quiet-small">A driver who is knocked out has no later qualifying time.</p></article>
-        <article class="chart-card"><div class="section-eyebrow">02 / SESSION-BY-SESSION</div><h3>Who had the edge?</h3><div id="qualDifferences" class="session-rows"></div><div class="lesson-card"><strong>How does qualifying affect the race?</strong><p id="qualExplainer"></p></div></article></div>
-      
-      <div class="analytics-grid analytics-bottom"><article class="chart-card"><div class="row spread"><div><div class="section-eyebrow">03 / SECTOR TIMES</div><h3>Where is time gained? <button class="help" type="button" aria-label="Explain lap sectors" data-tip="Each lap has three sectors: S1, S2 and S3.">?</button></h3></div><span class="chart-unit">RACE BEST SECTORS · SECONDS</span></div><div class="sector-bars" id="sectorBars"></div><div id="sectorTakeaway" class="sector-takeaway"></div></article>
-      <article class="chart-card"><div class="row spread"><div><div class="section-eyebrow">04 / SIMPLE SPEED GRAPH</div><h3>Understanding a speed trace <button type="button" class="help" aria-label="Explain speed graph" data-tip="A speed graph shows how a car speeds up on straights and slows down for turns.">?</button></h3></div><span class="chart-unit">TEACHING DEMO</span></div><svg id="speedChart" viewBox="0 0 650 290" class="chart-svg" role="img" aria-label="Illustrative comparison of speed through a lap"></svg><div class="speed-switches"><button class="metric-switch active" data-speed="speed" type="button">Speed</button><button class="metric-switch" data-speed="brake" type="button">Brake ?</button><button class="metric-switch" data-speed="throttle" type="button">Throttle ?</button></div><p class="quiet-small">Example speed graph.</p></article></div>
-      <footer class="section-footer"><span>Exact qualifying times + reference best sectors; speed trace schematic.</span><button class="text-btn" data-view="race">← Back to race replay</button></footer>
-    </section>
-  </main>
-  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
-</div>
-<script src="data.js?v=20261116-sketchcompare1"></script>
-<script src="app.js?v=20261116-sketchcompare1"></script>
-</body>
+          </div>
+        </section>
+        <!-- Qualifying times and pace charts -->
+        <section id="qualifyingView" class="view" aria-label="Qualifying and pace comparisons" hidden>
+          <div class="subpage-hero">
+            <div>
+              <h2>Qualifying</h2>
+              <p>Compare two drivers in Q1, Q2 and Q3.</p>
+            </div>
+          </div>
+          <p class="note-inline"><strong>Q1, Q2 and Q3</strong> are qualifying sessions. <strong>S1, S2 and S3</strong> are parts of a lap.</p>
+          <div class="qual-controls">
+            <button type="button" class="outline-btn" id="backToFocus">← Back to race view</button>
+            <div>
+              <label for="qualA">Driver A</label>
+              <select id="qualA" class="select-control"></select>
+            </div><span>VS</span>
+            <div>
+              <label for="qualB">Driver B</label>
+              <select id="qualB" class="select-control"></select>
+            </div>
+          </div>
+          <div class="qual-session-picker" role="group" aria-label="Highlight one qualifying round"><span>Round:</span>
+            <button type="button" class="session-pick active" data-session="0" aria-pressed="true">Q1</button>
+            <button type="button" class="session-pick" data-session="1" aria-pressed="false">Q2</button>
+            <button type="button" class="session-pick" data-session="2" aria-pressed="false">Q3</button>
+          </div>
+          <div id="selectedSessionResult" class="selected-session-result" aria-live="polite"></div>
+          <div id="qualTakeaway" class="headline-result" aria-live="polite"></div>
+          <div class="analytics-grid">
+            <article class="chart-card">
+              <div class="row spread">
+                <div>
+                  <div class="section-eyebrow">01 / QUALIFYING TIMES</div>
+                  <h3>Fastest lap by session 
+                    <button type="button" class="help" aria-label="Explain qualifying chart" data-tip="Lower times are faster. Compare drivers in the same round.">?</button>
+                  </h3>
+                </div><span class="chart-unit">SECONDS · LOWER IS FASTER</span>
+              </div>
+              <div class="line-legend" id="qualLegend"></div>
+              <svg id="qualChart" class="chart-svg" viewBox="0 0 650 320" role="img" aria-label="Qualifying time line chart for two selected drivers"></svg>
+              <div id="sessionDetails" class="session-details"></div>
+              <p class="quiet-small">A driver who is knocked out has no later qualifying time.</p>
+            </article>
+            <article class="chart-card">
+              <div class="section-eyebrow">02 / SESSION-BY-SESSION</div>
+              <h3>Who had the edge?</h3>
+              <div id="qualDifferences" class="session-rows"></div>
+              <div class="lesson-card"><strong>How does qualifying affect the race?</strong>
+                <p id="qualExplainer"></p>
+              </div>
+            </article>
+          </div>
+          <div class="analytics-grid analytics-bottom">
+            <article class="chart-card">
+              <div class="row spread">
+                <div>
+                  <div class="section-eyebrow">03 / SECTOR TIMES</div>
+                  <h3>Where is time gained? 
+                    <button class="help" type="button" aria-label="Explain lap sectors" data-tip="Each lap has three sectors: S1, S2 and S3.">?</button>
+                  </h3>
+                </div><span class="chart-unit">RACE BEST SECTORS · SECONDS</span>
+              </div>
+              <div class="sector-bars" id="sectorBars"></div>
+              <div id="sectorTakeaway" class="sector-takeaway"></div>
+            </article>
+            <article class="chart-card">
+              <div class="row spread">
+                <div>
+                  <div class="section-eyebrow">04 / SIMPLE SPEED GRAPH</div>
+                  <h3>Understanding a speed trace 
+                    <button type="button" class="help" aria-label="Explain speed graph" data-tip="A speed graph shows how a car speeds up on straights and slows down for turns.">?</button>
+                  </h3>
+                </div><span class="chart-unit">TEACHING DEMO</span>
+              </div>
+              <svg id="speedChart" viewBox="0 0 650 290" class="chart-svg" role="img" aria-label="Illustrative comparison of speed through a lap"></svg>
+              <div class="speed-switches">
+                <button class="metric-switch active" data-speed="speed" type="button">Speed</button>
+                <button class="metric-switch" data-speed="brake" type="button">Brake ?</button>
+                <button class="metric-switch" data-speed="throttle" type="button">Throttle ?</button>
+              </div>
+              <p class="quiet-small">Example speed graph.</p>
+            </article>
+          </div>
+          <footer class="section-footer"><span>Exact qualifying times + reference best sectors; speed trace schematic.</span>
+            <button class="text-btn" data-view="race">← Back to race replay</button>
+          </footer>
+        </section>
+      </main>
+      <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+    </div><script src="data.js?v=20261116-readable1"></script>
+<script src="app.js?v=20261116-readable1"></script>
+  </body>
 </html>
