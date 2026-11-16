@@ -1,5 +1,4 @@
-/* Race Lens · INFO 4900. Offline-first client-only prototype.
-   Data.js contains historical verified data + explicit schematic boundaries. */
+/* Interactive F1 race replay. Data.js contains historical reference data. */
 (() => {
   'use strict';
   const $ = (id) => document.getElementById(id);
@@ -297,16 +296,6 @@
     add('text',{x:L,y:15,class:'chart-text'},`${metric==='speed'?'SCHEMATIC SPEED':metric==='brake'?'SCHEMATIC BRAKE INPUT':'SCHEMATIC THROTTLE INPUT'} (ARBITRARY UNITS)`);
     add('text',{x:440,y:38,fill:'#73e1d5','font-size':11},'● Example A');add('text',{x:535,y:38,fill:'#87b8ff','font-size':11},'● Example B');
   }
-  function setupTask(){
-    const task='You missed the 2025 Las Vegas Grand Prix. Go to lap 2 and compare Lewis Hamilton with Charles Leclerc. Who was ahead? Which driver stopped first? Who had the quicker best Sector 1 time? In qualifying, did Hamilton reach Q2, and who was quicker in Q1?';
-    if($('copyTask')) $('copyTask').addEventListener('click',async()=>{
-      try{await navigator.clipboard.writeText(task);$('copyTask').textContent='Copied participant prompt ✓';}
-      catch{const t=document.createElement('textarea');t.value=task;document.body.append(t);t.select();document.execCommand('copy');t.remove();$('copyTask').textContent='Copied participant prompt ✓';}
-    });
-    if($('resetTest')) $('resetTest').addEventListener('click',()=>{document.querySelectorAll('.test-scoring input[type=checkbox]').forEach(el=>el.checked=false);});
-    const names={qualifying:'FIA qualifying',pits:'FIA pit details',lapChart:'FIA lap checkpoints',history:'FIA timing gaps',result:'F1 official result',tyre:'Tyre strategy',sectors:'Best sectors'};
-    if($('sourceLinks')) $('sourceLinks').innerHTML=Object.entries(names).map(([key,name])=>`<a href="${RACE.sources[key]}" target="_blank" rel="noopener noreferrer">${name} ↗</a>`).join('');
-  }
   function attachHandlers(){
     document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>setView(btn.dataset.view)));
     $('playBtn').addEventListener('click',play);$('lapSlider').addEventListener('input',e=>{pause();setLap(Number(e.target.value));});
@@ -327,7 +316,7 @@
     $('qualA').addEventListener('change',e=>{state.qualA=e.target.value;if(state.qualA===state.qualB){state.qualB=state.qualA==='NOR'?'VER':'NOR';$('qualB').value=state.qualB;}renderQualifying();});
     $('qualB').addEventListener('change',e=>{state.qualB=e.target.value;if(state.qualB===state.qualA){state.qualB=state.qualA==='VER'?'NOR':'VER';$('qualB').value=state.qualB;}renderQualifying();});
     document.querySelectorAll('[data-speed]').forEach(btn=>btn.addEventListener('click',()=>{state.speedMetric=btn.dataset.speed;document.querySelectorAll('[data-speed]').forEach(item=>item.classList.toggle('active',item===btn));drawSpeed();}));
-    configureTyres();setupMap();setupTooltips();setupTask();
+    configureTyres();setupMap();setupTooltips();
   }
   async function loadAllLapGaps(){
     try{
