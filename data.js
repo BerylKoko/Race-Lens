@@ -12,7 +12,8 @@ const RACE = {
     history:'https://www.fia.com/sites/default/files/2025_22_usa_f1_r0_timing_racehistorychart_v01.pdf',
     result:'https://www.formula1.com/en/results/2025/races/1274/las-vegas/race-result',
     tyre:'https://f1tracker.app/race/22?season=2025',
-    sectors:'https://en.mclarenf-1.com/2025/gp/1169/'
+    sectors:'https://en.mclarenf-1.com/2025/gp/1169/',
+    lapTimes:'https://api.jolpi.ca/ergast/f1/2025/22/laps/?limit=2000'
   }
 };
 // Q1–Q3 official best session times; missing rounds mean driver was eliminated.
@@ -70,13 +71,14 @@ const ORDERS = {
 };
 Object.entries(ORDERS).forEach(([k,s])=>{ORDERS[k] = s.split(' ').map(num=>BY_NUM[Number(num)]?.code).filter(Boolean)});
 // Selective FIA race history timing checkpoints; gaps to race leader, seconds.
-// Missing entries are shown as 'not in checked sample'. 'PIT' means no valid gap.
+// Unlisted laps can be populated at runtime from historical per-lap times.
+// Race chart gaps reflect ON-TRACK timing, before post-race penalties. 'PIT' flags a pit crossing.
 const GAPS = {
   1:{VER:0,RUS:1.013,NOR:2.103,LEC:6.290,HAM:8.062},
   2:{VER:0,RUS:2.642,NOR:4.537,LEC:13.104,HAM:19.016},
   24:{VER:0,RUS:21.966,NOR:24.777,LEC:'PIT',HAM:29.952},
   29:{VER:0,RUS:2.334,NOR:5.339,LEC:21.241,HAM:'PIT'},
-  50:{VER:0,RUS:23.546,NOR:20.741,LEC:30.678,HAM:59.369,PIA:27.650}
+  50:{VER:0,NOR:20.741,RUS:23.546,ANT:25.488,PIA:27.650,LEC:30.678,SAI:34.924,HAD:45.257,HUL:51.134,HAM:59.369,OCO:60.635,BEA:70.549,ALO:85.308,TSU:86.974,GAS:91.702}
 };
 // Best race sector times (not necessarily from the same lap): sourced from
 // F1 2025 Las Vegas results dataset on mclarenf-1.com.
