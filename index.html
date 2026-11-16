@@ -11,7 +11,7 @@
 <body>
 <div id="app" class="app">
   <header class="site-header simple-header">
-    <div><h1>Las Vegas Grand Prix <small>2025 prototype</small></h1></div>
+    <div><h1>Race Replay Explorer <small>Las Vegas Grand Prix · 2025</small></h1></div>
   </header>
 
   <nav class="top-tabs" aria-label="Primary views">
@@ -28,7 +28,7 @@
           <button id="lapBack" class="icon-btn" type="button" aria-label="Go back one lap">‹</button>
           <input type="range" id="lapSlider" min="1" max="50" value="2" aria-label="Selected lap, from 1 to 50">
           <button id="lapForward" class="icon-btn" type="button" aria-label="Go forward one lap">›</button>
-          <button id="previewBtn" class="outline-btn" type="button">Preview lap 24</button>
+          <label class="visually-hidden" for="quickLapSelect">Jump to lap</label><select id="quickLapSelect" class="select-control compact" aria-label="Jump to a lap"><option value="">Jump to lap…</option></select>
         </div>
       </div>
 
@@ -82,9 +82,9 @@
                   <label class="visually-hidden" for="focusSelect">Change focused driver</label>
                   <select id="focusSelect" class="select-control focus-header-picker" aria-label="Select driver beside Driver Focus heading"></select>
                 </div>
-                <div class="focus-identity"><div class="section-eyebrow">03 / SELECTED DRIVER</div><h3 id="focusName">Lewis Hamilton</h3><p id="focusTeam" class="muted">Ferrari</p></div>
+                <div class="focus-identity"><div class="focus-title-row"><h3 id="focusName">Lewis Hamilton</h3><span id="focusPosition" class="position-pill">P12</span></div><p id="focusTeam" class="muted">Ferrari</p></div>
               </div>
-              <div class="focus-actions"><button id="compareToggle" type="button" class="primary-btn secondary-action" aria-expanded="false" aria-controls="compareInline">+ Compare</button><span id="focusPosition" class="position-pill">P12</span></div>
+              <div class="focus-actions"><button id="compareToggle" type="button" class="primary-btn secondary-action" aria-expanded="false" aria-controls="compareInline">+ Compare</button></div>
             </div>
             <div class="stat-grid">
               <div class="stat"><span>Current tyre <button class="help inline-help" type="button" aria-label="Explain tyre age" data-tip="Tyre age: how many laps these tyres have been used.">?</button></span><strong id="focusTyre">Hard · 2 laps</strong></div>
@@ -98,15 +98,9 @@
               <div class="compare-row"><div class="compare-person"><small>DRIVER A · FOCUS</small><strong id="compareAName">Lewis Hamilton</strong><span id="compareADetail"></span></div><span class="vs">VS</span><div class="compare-person"><label for="compareBSelect">DRIVER B</label><select class="select-control" id="compareBSelect" aria-label="Choose a second driver"></select><span id="compareBDetail"></span></div></div>
               <div id="compareTakeaway" class="compare-takeaway" aria-live="polite"></div>
               <div class="compare-mini-grid"><div><small>DRIVER A / PITS</small><b id="compareAPits"></b></div><div><small>DRIVER B / PITS</small><b id="compareBPits"></b></div></div>
-              <div class="inline-metrics-intro"><strong>Compare their timings</strong><p>Q1, Q2 and Q3 are qualifying sessions. S1, S2 and S3 are parts of a lap.</p></div>
-              <div class="inline-timing-grid">
-                <section class="inline-timing-card" aria-label="Qualifying round times">
-                  <h4>Q1 / Q2 / Q3 <button class="help" type="button" aria-label="Explain qualifying rounds" data-tip="Q1, Q2 and Q3 are qualifying rounds. Slower drivers are eliminated after each round.">?</button></h4>
-                  <div id="inlineQualRows" class="inline-timing-rows"></div>
-                  <p class="quiet-small">Lower time is faster.</p>
-                </section>
-                <section class="inline-timing-card" aria-label="Best race sector times">
-                  <h4>S1 / S2 / S3 <button class="help" type="button" aria-label="Explain lap sectors" data-tip="S1, S2 and S3 are the three parts of a lap.">?</button></h4>
+              <div class="inline-metrics-intro"><strong>Compare sector times</strong><p>S1, S2 and S3 are parts of a lap.</p></div>
+              <div class="inline-timing-grid"><section class="inline-timing-card" aria-label="Best race sector times">
+                  <h4>Sector times <button class="help" type="button" aria-label="Explain lap sectors" data-tip="S1, S2 and S3 are the three parts of a lap.">?</button></h4>
                   <div id="inlineSectorRows" class="inline-timing-rows"></div>
                   <p class="quiet-small">Best sector times.</p>
                 </section>
