@@ -6,10 +6,10 @@ Open **`index.html`** in a modern web browser. No build, sign-in, internet conne
 
 ## What is implemented
 
-- Replays a **2025 Las Vegas Grand Prix** reference event with a working 50-lap slider, play/pause, step controls, and *selected* historic position checkpoints (other laps use the last recorded checkpoint in this reference dataset).
+- Replays a **2025 Las Vegas Grand Prix** reference event with a working 50-lap slider, play/pause, step controls, a jump-to-lap dropdown, and *selected* historic position checkpoints (other laps use the last recorded checkpoint in this reference dataset).
 - Interactive schematic circuit with selectable driver markers, drag-to-pan, zoom/reset with all 20 markers visible and selectable.
 - Running order, clickable driver selection, current tyre filters using **Soft / Medium / Hard checkboxes**, summaries and pit-stop progress. The checkboxes filter the matching-driver chips; the map and running order always show all 20 entrants.
-- Integrated **Driver Focus** with the selector immediately beside its heading, optional **Compare** disclosure, paired driver cards, compact **Q1/Q2/Q3 and S1/S2/S3** comparisons, evidence-based differences, and short contextual `?` tooltips for tyre compounds, tyre age, race gaps, and pit stops.
+- Integrated **Driver Focus** with the selector immediately beside its heading and the selected driver's race position beside their name, optional **Compare** disclosure, paired driver cards, compact **S1/S2/S3** sector comparisons (the Q1/Q2/Q3 chart remains in the separate Qualifying tab), evidence-based differences, and short contextual `?` tooltips for tyre compounds, tyre age, race gaps, and pit stops.
 - Qualifying guide defining **Q1/Q2/Q3** distinctly from **S1/S2/S3**; two-driver Q-session chart, selectable Q1/Q2/Q3 round highlights, and round-by-round differences sourced from official FIA qualifying classification. Opening it from Driver Focus preserves the chosen pair and offers a direct return to Driver Focus.
 - Verified *best race sector* comparison for drivers for whom reference data is available (best S1/S2/S3 may come from different laps).
 - Clearly labeled **schematic** speed / brake / throttle visual teaching demo; never passed off as actual telemetry.
