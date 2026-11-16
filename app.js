@@ -72,7 +72,7 @@
     const counts={Soft:0,Medium:0,Hard:0,Unknown:0};active.forEach(d=>counts[tyreState(d).name]++);
     $('fieldCount').textContent=`${DRIVERS.length} drivers · ${active.length} still running at lap ${state.lap}`;
     $('tyreSummary').innerHTML=['Soft','Medium','Hard'].map(name=>{
-      const percent=Math.round(counts[name]/(active.length||1)*100);const tip=name==='Soft'?'Soft: fastest grip, but it wears out the quickest.':name==='Medium'?'Medium: a balance between speed and tyre life.':'Hard: slower, but it lasts the longest.';return `<div class="tyre-line"><span><i class="tyre-dot ${name.toLowerCase()}"></i>${name} <button class="help inline-help" type="button" data-tip="${tip}" aria-label="What is a ${name.toLowerCase()} tyre?">?</button></span><b>${counts[name]}</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:${percent}%;background:${name==='Soft'?'#f36b8f':name==='Medium'?'#f5d275':'#ecf3f9'}"></span></div>`;
+      const percent=Math.round(counts[name]/(active.length||1)*100);return `<div class="tyre-line"><span><i class="tyre-dot ${name.toLowerCase()}"></i>${name}</span><b>${counts[name]}</b></div><div class="tyre-bar"><span class="tyre-bar-fill" style="width:${percent}%;background:${name==='Soft'?'#f36b8f':name==='Medium'?'#f5d275':'#ecf3f9'}"></span></div>`;
     }).join('');
     
     const matches=runningAt().filter(code=>isActive(driver(code)) && filtered(code));
@@ -156,7 +156,7 @@
     if(sa&&sb){
       $('inlineSectorRows').innerHTML=[0,1,2].map(i=>{
         const quicker=sa[i]<sb[i]?a:b;
-        return `<div class="inline-timing-row"><b>S${i+1}</b><span>${a.code} ${fmt(sa[i])}s · ${b.code} ${fmt(sb[i])}s</span><strong>${quicker.name} was ${fmtShort(Math.abs(sa[i]-sb[i]))}s quicker.</strong></div>`;
+        return `<div class="inline-timing-row"><b>S${i+1}</b><span>${a.code} ${fmt(sa[i])}s · ${b.code} ${fmt(sb[i])}s</span><strong>${quicker.name} was ${fmt(Math.abs(sa[i]-sb[i]))}s quicker.</strong></div>`;
       }).join('');
     }else $('inlineSectorRows').innerHTML='<p class="quiet-small">Sector times are not available for both drivers.</p>';
     const gapA=knownGap(a.code),gapB=knownGap(b.code), pa=position(a.code), pb=position(b.code);
@@ -168,7 +168,7 @@
       const ahead = pa<pb?a:b;
       firstLine = `${ahead.name} is ahead.`;
     }
-    const sectorLine=sa&&sb?`${(sa[0]<sb[0]?a:b).name} was ${fmtShort(Math.abs(sa[0]-sb[0]))}s quicker in best S1.`:'Sector comparison is not available.';
+    const sectorLine=sa&&sb?`${(sa[0]<sb[0]?a:b).name} was ${fmt(Math.abs(sa[0]-sb[0]))}s quicker in best S1.`:'Sector comparison is not available.';
     $('inlineTimingSummary').textContent=[firstLine, sectorLine].filter(Boolean).join(' ');
   }
   function renderReplay(){
@@ -327,7 +327,6 @@
     $('lapBack').addEventListener('click',()=>{pause();setLap(state.lap-1);});$('lapForward').addEventListener('click',()=>{pause();setLap(state.lap+1);});
     const quick=$('quickLapSelect');
     if(quick){
-      quick.innerHTML='<option value="">Jump to lap…</option>' + Array.from({length:RACE.totalLaps},(_,i)=>`<option value="${i+1}">Lap ${i+1}</option>`).join('');
       quick.addEventListener('change',()=>{ if(quick.value){ pause(); setLap(Number(quick.value)); } });
     }
     $('driverSelect').addEventListener('change',e=>focus(e.target.value));$('focusSelect').addEventListener('change',e=>focus(e.target.value));
